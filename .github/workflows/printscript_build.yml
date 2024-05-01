@@ -1,0 +1,18 @@
+name: PrintScript Build
+
+on:
+  pull_request:
+    branches: [ "main" , "dev" ]
+  push:
+    branches: [ "main" , "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+      - name: Build with Gradle
+        run: ./gradlew clean build
