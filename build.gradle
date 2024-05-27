@@ -68,7 +68,12 @@ tasks.register('checkGitHooksPath') {
 		def currentHooksPath = 'git config core.hooksPath'.execute().text.trim()
 
 		if (currentHooksPath != desiredHooksPath) {
-			throw new GradleException("Git hooks path is not set correctly. Expected: $desiredHooksPath, Actual: $currentHooksPath")
+			println "Git hooks path is not set correctly."
+			println "Setting git hooks path to $desiredHooksPath"
+			"git config core.hooksPath $desiredHooksPath".execute().waitFor()
+			println "Git hooks path set to $desiredHooksPath"
+		} else {
+			println "Git hooks path is already set correctly."
 		}
 	}
 }
