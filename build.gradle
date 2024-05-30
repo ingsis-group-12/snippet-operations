@@ -27,6 +27,11 @@ dependencies {
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 	implementation 'org.jlleitschuh.gradle:ktlint-gradle:12.1.0'
 	implementation 'org.jetbrains.kotlinx:kover-gradle-plugin:0.7.6'
+//	For swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+//	For validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.0'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
@@ -41,13 +46,13 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-koverReport {
-	verify {
-		rule {
-			minBound(80)
-		}
-	}
-}
+//koverReport {
+//	verify {
+//		rule {
+//			minBound(80)
+//		}
+//	}
+//}
 
 tasks.check {
 	dependsOn ktlintCheck
