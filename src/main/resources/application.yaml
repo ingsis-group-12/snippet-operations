@@ -1,8 +1,14 @@
 auth0:
-  audience: localhost:8080
+  audience: https://snippet-auth.com/
 spring:
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://dev-cfez21t6f710b2pa.us.auth0.com/
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

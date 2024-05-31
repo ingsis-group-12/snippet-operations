@@ -29,7 +29,7 @@ class SecurityConfiguration(
 //                .requestMatchers(GET, "/snippet").hasAuthority("SCOPE_read:snippets")
 //                .requestMatchers(GET, "/snippet/*").hasAuthority("SCOPE_read:snippets")
 //                .requestMatchers(POST, "/snippet").hasAuthority("SCOPE_write:snippets")
-                .requestMatchers("/**").authenticated()
+                .anyRequest().authenticated()
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }
             .cors {
