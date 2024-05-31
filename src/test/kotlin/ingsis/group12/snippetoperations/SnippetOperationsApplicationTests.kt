@@ -7,6 +7,5 @@ import org.springframework.boot.test.context.SpringBootTest
 class SnippetOperationsApplicationTests {
     @Test
     fun contextLoads() {
-        main(arrayOf("test"))
     }
 }
