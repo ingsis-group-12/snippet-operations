@@ -2,7 +2,7 @@ package ingsis.group12.snippetoperations.input
 
 import jakarta.validation.constraints.NotNull
 
-data class Snippet(
+data class SnippetInput(
     @field:NotNull(message = "property name is missing")
     val name: String?,
     @field:NotNull(message = "property content is missing")

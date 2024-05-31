@@ -1,6 +1,6 @@
 package ingsis.group12.snippetoperations.controller
 
-import ingsis.group12.snippetoperations.input.Snippet
+import ingsis.group12.snippetoperations.input.SnippetInput
 import ingsis.group12.snippetoperations.model.SnippetDTO
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -21,7 +21,7 @@ class SnippetController {
     @PostMapping()
     @ApiResponse(responseCode = "200", description = "OK")
     fun createSnippet(
-        @Valid @RequestBody snippet: Snippet,
+        @Valid @RequestBody snippetInput: SnippetInput,
     ): ResponseEntity<SnippetDTO> {
         return ResponseEntity.ok(SnippetDTO("1", "SNIPPET", "const num:number = 5;", "printscript", ".ps"))
     }
@@ -44,7 +44,7 @@ class SnippetController {
     @ApiResponse(responseCode = "200", description = "OK")
     fun updateSnippet(
         @PathVariable("id") snippetId: String,
-        @Valid @RequestBody snippet: Snippet,
+        @Valid @RequestBody snippetInput: SnippetInput,
     ): ResponseEntity<SnippetDTO> {
         return ResponseEntity.ok(SnippetDTO(snippetId, "name", "content", "language", "extension"))
     }
