@@ -1,5 +1,5 @@
 auth0:
-  audience: https://snippet-auth.com/
+  audience: https://snippet-auth.com
 spring:
   security:
     oauth2:
