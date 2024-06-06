@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.util.Date
+import java.util.UUID
 
 @Entity
 @Table(name = "snippet")
@@ -14,15 +15,15 @@ data class Snippet(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
-    var id: String? = null,
+    val id: String? = null,
     @Column(name = "name", nullable = false)
-    var name: String = "",
-    @Column(name = "content", nullable = false)
-    var content: String = "",
+    val name: String? = null,
     @Column(name = "language", nullable = false)
-    var language: String = "",
-    @Column(name = "createdAt", nullable = false)
-    var createdAt: Date? = null,
+    val language: String? = null,
+    @Column(name = "extension", nullable = false)
+    val extension: String? = null,
+    @Column(name = "createdAt", nullable = false, updatable = false)
+    val createdAt: Date? = Date(),
     @Column(name = "updatedAt", nullable = true)
-    var updatedAt: Date? = null,
+    val updatedAt: Date? = null,
 )

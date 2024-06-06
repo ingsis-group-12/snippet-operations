@@ -5,4 +5,5 @@ data class SnippetDTO(
     val name: String,
     val content: String,
     val language: String,
+    val extension: String,
 )
