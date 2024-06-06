@@ -1,6 +1,6 @@
-package ingsis.group12.snippetoperations.service
+package ingsis.group12.snippetoperations.snippet.service
 
-import ingsis.group12.snippetoperations.input.SnippetInput
+import ingsis.group12.snippetoperations.snippet.input.SnippetInput
 import org.springframework.stereotype.Service
 
 @Service

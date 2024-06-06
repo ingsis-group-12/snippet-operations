@@ -1,7 +1,7 @@
-package ingsis.group12.snippetoperations.controller
+package ingsis.group12.snippetoperations.snippet.controller
 
-import ingsis.group12.snippetoperations.input.SnippetInput
-import ingsis.group12.snippetoperations.model.SnippetDTO
+import ingsis.group12.snippetoperations.snippet.dto.SnippetDTO
+import ingsis.group12.snippetoperations.snippet.input.SnippetInput
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -23,13 +23,13 @@ class SnippetController {
     fun createSnippet(
         @Valid @RequestBody snippetInput: SnippetInput,
     ): ResponseEntity<SnippetDTO> {
-        return ResponseEntity.ok(SnippetDTO("1", "SNIPPET", "const num:number = 5;", "printscript", ".ps"))
+        return ResponseEntity.ok(SnippetDTO("1", "SNIPPET", "const num:number = 5;", "printscript"))
     }
 
     @GetMapping()
     @ApiResponse(responseCode = "200", description = "OK")
     fun getSnippets(): ResponseEntity<List<SnippetDTO>> {
-        return ResponseEntity.ok(listOf(SnippetDTO("1", "name", "content", "language", "extension")))
+        return ResponseEntity.ok(listOf(SnippetDTO("1", "name", "content", "language")))
     }
 
     @GetMapping("/{id}")
@@ -37,7 +37,7 @@ class SnippetController {
     fun getSnippetById(
         @PathVariable("id") snippetId: String,
     ): ResponseEntity<SnippetDTO> {
-        return ResponseEntity.ok(SnippetDTO(snippetId, "name", "content", "language", "extension"))
+        return ResponseEntity.ok(SnippetDTO(snippetId, "name", "content", "language"))
     }
 
     @PutMapping("/{id}")
@@ -46,6 +46,6 @@ class SnippetController {
         @PathVariable("id") snippetId: String,
         @Valid @RequestBody snippetInput: SnippetInput,
     ): ResponseEntity<SnippetDTO> {
-        return ResponseEntity.ok(SnippetDTO(snippetId, "name", "content", "language", "extension"))
+        return ResponseEntity.ok(SnippetDTO(snippetId, "name", "content", "language"))
     }
 }

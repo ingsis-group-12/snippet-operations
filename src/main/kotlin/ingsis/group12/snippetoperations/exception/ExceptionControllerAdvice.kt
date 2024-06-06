@@ -1,6 +1,6 @@
 package ingsis.group12.snippetoperations.exception
 
-import ingsis.group12.snippetoperations.model.ErrorMessage
+import ingsis.group12.snippetoperations.util.ErrorMessage
 import org.springframework.context.support.DefaultMessageSourceResolvable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

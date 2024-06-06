@@ -1,4 +1,4 @@
-package ingsis.group12.snippetoperations.input
+package ingsis.group12.snippetoperations.snippet.input
 
 import jakarta.validation.constraints.NotNull
 
