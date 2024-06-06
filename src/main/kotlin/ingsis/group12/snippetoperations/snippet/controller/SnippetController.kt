@@ -11,13 +11,27 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.security.Principal
 
 @RestController
 @RequestMapping("/snippet")
 @Tag(name = "Snippet")
 class SnippetController {
+    /*
+    To get the auth0 userId use Principal java security for each request that you need it.
+    The code above is just an example to use it.
+     */
+    @GetMapping("/jwt")
+    fun jwt(
+        @RequestHeader("Authorization") token: String,
+        principal: Principal,
+    ): String {
+        return principal.name
+    }
+
     @PostMapping()
     @ApiResponse(responseCode = "200", description = "OK")
     fun createSnippet(

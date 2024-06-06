@@ -34,7 +34,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.3.0'
 //	For validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.0'
-
+	//Spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	//OAuth2
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
