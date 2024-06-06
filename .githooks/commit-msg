@@ -8,7 +8,7 @@ TEMPORARY_FILE_PATH=$1
 # Get commit-message from the temporary file
 COMMIT_MSG=`head -n1 $TEMPORARY_FILE_PATH`
 
-REGEX="^(feat|fix|perf|docs|style|refactor|test|build|merge|hotfix): .+$"
+REGEX="^(feat|fix|perf|docs|style|refactor|test|build|merge|hotfix|chore): .+$"
 
 # Check if the commit message matches the regex pattern
 if [[ ! $COMMIT_MSG =~ $REGEX ]]; then
