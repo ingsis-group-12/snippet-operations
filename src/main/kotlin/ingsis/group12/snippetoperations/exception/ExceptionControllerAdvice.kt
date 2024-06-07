@@ -33,4 +33,16 @@ class ExceptionControllerAdvice {
 
         return ResponseEntity(body, HttpStatus.BAD_REQUEST)
     }
+
+    @ExceptionHandler(SnippetCreationError::class)
+    fun handleSnippetCreationError(exception: SnippetCreationError): ResponseEntity<ErrorMessage> {
+        val error = ErrorMessage(exception.message, HttpStatus.CONFLICT.value())
+        return ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+
+    @ExceptionHandler(SnippetNotFoundError::class)
+    fun handleSnippetNotFoundError(exception: SnippetNotFoundError): ResponseEntity<ErrorMessage> {
+        val error = ErrorMessage(exception.message, HttpStatus.NOT_FOUND.value())
+        return ResponseEntity(error, HttpStatus.NOT_FOUND)
+    }
 }

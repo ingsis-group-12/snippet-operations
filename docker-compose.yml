@@ -22,5 +22,29 @@ services:
     env_file:
       - .env
 
+  asset_service_dev:
+    container_name: "asset_service_dev"
+    image: ghcr.io/austral-ingsis/snippet-asset-service:latest
+    ports:
+      - "8080:8080"
+    environment:
+      AZURE_HOST: "http://azurite"
+      NEW_RELIC_AGENT_ENABLED: false
+
+  azurite_dev:
+      image: mcr.microsoft.com/azure-storage/azurite
+      container_name: "azurite_dev"
+      hostname: azurite
+      restart: always
+      ports:
+        - "10000:10000"
+        - "10001:10001"
+        - "10002:10002"
+      volumes:
+        - blob:/workspace
+
+
 volumes:
   postgres-data:
+  blob:
+    external: false

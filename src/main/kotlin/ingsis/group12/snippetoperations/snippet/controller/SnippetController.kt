@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/snippet")
@@ -47,15 +48,17 @@ class SnippetController(
     @GetMapping()
     @ApiResponse(responseCode = "200", description = "OK")
     fun getSnippets(): ResponseEntity<List<SnippetDTO>> {
-        return ResponseEntity.ok(listOf(SnippetDTO("1", "name", "content", "language", "ps")))
+        return ResponseEntity.ok(listOf(SnippetDTO(UUID.randomUUID(), "name", "content", "language", "ps")))
     }
 
     @GetMapping("/{id}")
     @ApiResponse(responseCode = "200", description = "OK")
     fun getSnippetById(
-        @PathVariable("id") snippetId: String,
+        @PathVariable("id") snippetId: UUID,
+        @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<SnippetDTO> {
-        return ResponseEntity.ok(SnippetDTO(snippetId, "name", "content", "language", "ps"))
+        val result = snippetService.getSnippetById(snippetId)
+        return ResponseEntity.ok(result)
     }
 
     @PutMapping("/{id}")
@@ -64,6 +67,6 @@ class SnippetController(
         @PathVariable("id") snippetId: String,
         @Valid @RequestBody snippetInput: SnippetInput,
     ): ResponseEntity<SnippetDTO> {
-        return ResponseEntity.ok(SnippetDTO(snippetId, "name", "content", "language", "ps"))
+        return ResponseEntity.ok(SnippetDTO(UUID.randomUUID(), "name", "content", "language", "ps"))
     }
 }
