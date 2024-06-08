@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
@@ -59,6 +60,15 @@ class SnippetServiceImpl(
         throw SnippetNotFoundError("Snippet not found")
     }
 
+    override fun deleteSnippetById(snippetId: UUID): String {
+        val result = snippetRepository.findById(snippetId)
+        if (result.isPresent) {
+            snippetRepository.deleteById(snippetId)
+            return "Snippet deleted with id $snippetId"
+        }
+        throw SnippetNotFoundError("Snippet not found")
+    }
+
     private fun getSnippetFromBucket(snippetId: UUID): ResponseEntity<String> {
         val url = "$bucketUrl/$snippetId"
         val response = restTemplate.getForEntity(url, String::class.java)
@@ -94,6 +104,12 @@ class SnippetServiceImpl(
         headers.contentType = MediaType.APPLICATION_JSON
         val entity = HttpEntity(snippet.content, headers)
         val response = restTemplate.postForEntity(url, entity, String::class.java)
+        return response.statusCode
+    }
+
+    private fun deleteSnippetFromBucket(snippetId: UUID): HttpStatusCode {
+        val url = "$bucketUrl/$snippetId"
+        val response = restTemplate.exchange(url, HttpMethod.DELETE, null, String::class.java)
         return response.statusCode
     }
 }

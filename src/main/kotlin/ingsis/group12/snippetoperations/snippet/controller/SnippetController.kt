@@ -9,10 +9,10 @@ import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -61,12 +61,13 @@ class SnippetController(
         return ResponseEntity.ok(result)
     }
 
-    @PutMapping("/{id}")
+    @DeleteMapping("/{id}")
     @ApiResponse(responseCode = "200", description = "OK")
-    fun updateSnippet(
-        @PathVariable("id") snippetId: String,
-        @Valid @RequestBody snippetInput: SnippetInput,
-    ): ResponseEntity<SnippetDTO> {
-        return ResponseEntity.ok(SnippetDTO(UUID.randomUUID(), "name", "content", "language", "ps"))
+    fun deleteSnippetById(
+        @PathVariable("id") snippetId: UUID,
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<String> {
+        val result = snippetService.deleteSnippetById(snippetId)
+        return ResponseEntity.ok(result)
     }
 }

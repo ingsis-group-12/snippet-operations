@@ -11,4 +11,6 @@ interface SnippetService {
     ): SnippetDTO
 
     fun getSnippetById(snippetId: UUID): SnippetDTO
+
+    fun deleteSnippetById(snippetId: UUID): String
 }
