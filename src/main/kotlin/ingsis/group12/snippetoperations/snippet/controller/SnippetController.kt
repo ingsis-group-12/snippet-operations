@@ -62,7 +62,7 @@ class SnippetController(
     }
 
     @DeleteMapping("/{id}")
-    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "204", description = "OK")
     fun deleteSnippetById(
         @PathVariable("id") snippetId: UUID,
         @AuthenticationPrincipal jwt: Jwt,

@@ -45,4 +45,10 @@ class ExceptionControllerAdvice {
         val error = ErrorMessage(exception.message, HttpStatus.NOT_FOUND.value())
         return ResponseEntity(error, HttpStatus.NOT_FOUND)
     }
+
+    @ExceptionHandler(SnippetDeleteError::class)
+    fun handleSnippetDeleteError(exception: SnippetDeleteError): ResponseEntity<ErrorMessage> {
+        val error = ErrorMessage(exception.message, HttpStatus.CONFLICT.value())
+        return ResponseEntity(error, HttpStatus.CONFLICT)
+    }
 }

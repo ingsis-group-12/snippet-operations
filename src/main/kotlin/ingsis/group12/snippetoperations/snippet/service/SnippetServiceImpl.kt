@@ -1,6 +1,7 @@
 package ingsis.group12.snippetoperations.snippet.service
 
 import ingsis.group12.snippetoperations.exception.SnippetCreationError
+import ingsis.group12.snippetoperations.exception.SnippetDeleteError
 import ingsis.group12.snippetoperations.exception.SnippetNotFoundError
 import ingsis.group12.snippetoperations.snippet.dto.SnippetDTO
 import ingsis.group12.snippetoperations.snippet.input.SnippetInput
@@ -11,8 +12,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -34,11 +33,8 @@ class SnippetServiceImpl(
     ): SnippetDTO {
         val snippetId = UUID.randomUUID()
         val url = "$bucketUrl/$snippetId"
-        val status = addSnippetIntoBucket(snippetInput, url)
-        /*
-        Todo: add permission api call
-         */
-        if (status == HttpStatus.CREATED) {
+        val response = addSnippetIntoBucket(snippetInput, url)
+        if (response.statusCode.is2xxSuccessful) {
             return saveSnippet(snippetInput, snippetId)
         }
         throw SnippetCreationError("Error while creating snippet")
@@ -63,16 +59,15 @@ class SnippetServiceImpl(
     override fun deleteSnippetById(snippetId: UUID): String {
         val result = snippetRepository.findById(snippetId)
         if (result.isPresent) {
-            snippetRepository.deleteById(snippetId)
-            return "Snippet deleted with id $snippetId"
+            val response = deleteSnippetFromBucket(snippetId)
+            if (response.statusCode.is2xxSuccessful) {
+                snippetRepository.deleteById(snippetId)
+                return "Snippet deleted with id $snippetId"
+            } else {
+                throw SnippetDeleteError("Error while deleting snippet from bucket")
+            }
         }
         throw SnippetNotFoundError("Snippet not found")
-    }
-
-    private fun getSnippetFromBucket(snippetId: UUID): ResponseEntity<String> {
-        val url = "$bucketUrl/$snippetId"
-        val response = restTemplate.getForEntity(url, String::class.java)
-        return response
     }
 
     private fun saveSnippet(
@@ -96,20 +91,23 @@ class SnippetServiceImpl(
         )
     }
 
+    private fun getSnippetFromBucket(snippetId: UUID): ResponseEntity<String> {
+        val url = "$bucketUrl/$snippetId"
+        return restTemplate.getForEntity(url, String::class.java)
+    }
+
     private fun addSnippetIntoBucket(
         snippet: SnippetInput,
         url: String,
-    ): HttpStatusCode {
+    ): ResponseEntity<String> {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         val entity = HttpEntity(snippet.content, headers)
-        val response = restTemplate.postForEntity(url, entity, String::class.java)
-        return response.statusCode
+        return restTemplate.postForEntity(url, entity, String::class.java)
     }
 
-    private fun deleteSnippetFromBucket(snippetId: UUID): HttpStatusCode {
+    private fun deleteSnippetFromBucket(snippetId: UUID): ResponseEntity<String> {
         val url = "$bucketUrl/$snippetId"
-        val response = restTemplate.exchange(url, HttpMethod.DELETE, null, String::class.java)
-        return response.statusCode
+        return restTemplate.exchange(url, HttpMethod.DELETE, null, String::class.java)
     }
 }
