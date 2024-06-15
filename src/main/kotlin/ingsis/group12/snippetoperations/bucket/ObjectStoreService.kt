@@ -6,10 +6,10 @@ import java.util.UUID
 interface ObjectStoreService {
     fun create(
         content: String,
-        snippetId: UUID,
+        assetId: UUID,
     ): ResponseEntity<String>
 
-    fun get(snippetId: UUID): ResponseEntity<String>
+    fun get(assetId: UUID): ResponseEntity<String>
 
-    fun delete(snippetId: UUID): ResponseEntity<String>
+    fun delete(assetId: UUID): ResponseEntity<String>
 }

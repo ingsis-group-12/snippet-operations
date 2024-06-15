@@ -20,22 +20,22 @@ class AzureObjectStoreService(
 
     override fun create(
         content: String,
-        snippetId: UUID,
+        assetId: UUID,
     ): ResponseEntity<String> {
-        val url = "$bucketUrl/$snippetId"
+        val url = "$bucketUrl/$assetId"
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         val entity = HttpEntity(content, headers)
         return restTemplate.postForEntity(url, entity, String::class.java)
     }
 
-    override fun get(snippetId: UUID): ResponseEntity<String> {
-        val url = "$bucketUrl/$snippetId"
+    override fun get(assetId: UUID): ResponseEntity<String> {
+        val url = "$bucketUrl/$assetId"
         return restTemplate.getForEntity(url, String::class.java)
     }
 
-    override fun delete(snippetId: UUID): ResponseEntity<String> {
-        val url = "$bucketUrl/$snippetId"
+    override fun delete(assetId: UUID): ResponseEntity<String> {
+        val url = "$bucketUrl/$assetId"
         return restTemplate.exchange(url, HttpMethod.DELETE, null, String::class.java)
     }
 }
