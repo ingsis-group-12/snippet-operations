@@ -1,4 +1,4 @@
-package ingsis.group12.snippetoperations.snippet.model
+package ingsis.group12.snippetoperations.asset.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

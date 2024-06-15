@@ -1,8 +1,8 @@
-package ingsis.group12.snippetoperations.snippet.controller
+package ingsis.group12.snippetoperations.asset.controller
 
-import ingsis.group12.snippetoperations.snippet.dto.SnippetDTO
-import ingsis.group12.snippetoperations.snippet.input.SnippetInput
-import ingsis.group12.snippetoperations.snippet.service.SnippetService
+import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
+import ingsis.group12.snippetoperations.asset.input.SnippetInput
+import ingsis.group12.snippetoperations.asset.service.SnippetService
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -24,16 +24,6 @@ import java.util.UUID
 class SnippetController(
     private val snippetService: SnippetService,
 ) {
-    /*
-     ** Example to get auth0 id on jwt token
-     */
-    @GetMapping("/jwt")
-    fun jwt(
-        @AuthenticationPrincipal jwt: Jwt,
-    ): String {
-        return jwt.subject
-    }
-
     @PostMapping()
     @ApiResponse(responseCode = "200", description = "OK")
     fun createSnippet(
@@ -41,14 +31,14 @@ class SnippetController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<SnippetDTO> {
         val userId = jwt.subject
-        val snippet = snippetService.createSnippet(snippetInput, userId)
+        val snippet = snippetService.createAsset(snippetInput, userId)
         return ResponseEntity.ok(snippet)
     }
 
     @GetMapping()
     @ApiResponse(responseCode = "200", description = "OK")
     fun getSnippets(): ResponseEntity<List<SnippetDTO>> {
-        return ResponseEntity.ok(listOf(SnippetDTO(UUID.randomUUID(), "name", "content", "language", "ps")))
+        return ResponseEntity.ok(snippetService.getAssets())
     }
 
     @GetMapping("/{id}")
@@ -57,7 +47,7 @@ class SnippetController(
         @PathVariable("id") snippetId: UUID,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<SnippetDTO> {
-        val result = snippetService.getSnippetById(snippetId)
+        val result = snippetService.getAssetById(snippetId)
         return ResponseEntity.ok(result)
     }
 
@@ -67,7 +57,7 @@ class SnippetController(
         @PathVariable("id") snippetId: UUID,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<String> {
-        val result = snippetService.deleteSnippetById(snippetId)
+        val result = snippetService.deleteAssetById(snippetId)
         return ResponseEntity.ok(result)
     }
 }
