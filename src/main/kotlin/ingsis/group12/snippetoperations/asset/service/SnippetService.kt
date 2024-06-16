@@ -27,9 +27,7 @@ class SnippetService(
         val permissionResponse = permissionService.create(userId, snippetId, PermissionDTO("owner"))
         if (permissionResponse.statusCode.is2xxSuccessful) {
             val storageResponse = objectStoreService.create(assetInput.content, snippetId)
-
             if (storageResponse.statusCode.is2xxSuccessful) {
-                println("Llego aqui 4")
                 return saveSnippet(assetInput, snippetId)
             }
         }
