@@ -86,7 +86,7 @@ class SnippetService(
         val result = snippetRepository.findById(shareDTO.assetId)
         val userPermission = permissionService.getUserPermissionByAssetId(shareDTO.assetId, userId)
         if (result.isPresent && userPermission.body!!.permission == "owner") {
-            permissionService.create(shareDTO.userId, shareDTO.assetId, PermissionDTO("read:write"))
+            permissionService.create(shareDTO.userId, shareDTO.assetId, PermissionDTO("read"))
         } else {
             throw SnippetNotFoundError("Snippet not found")
         }
