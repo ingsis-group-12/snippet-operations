@@ -1,5 +1,6 @@
 package ingsis.group12.snippetoperations.asset.controller
 
+import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
 import ingsis.group12.snippetoperations.asset.service.SnippetService
@@ -59,5 +60,16 @@ class SnippetController(
     ): ResponseEntity<String> {
         val result = snippetService.deleteAssetById(snippetId)
         return ResponseEntity.ok(result)
+    }
+
+    @PostMapping("/share")
+    @ApiResponse(responseCode = "204", description = "OK")
+    fun shareSnippet(
+        @Valid @RequestBody shareDTO: ShareDTO,
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<SnippetDTO> {
+        val userId = jwt.subject
+        snippetService.shareAsset(userId, shareDTO)
+        return ResponseEntity.noContent().build()
     }
 }

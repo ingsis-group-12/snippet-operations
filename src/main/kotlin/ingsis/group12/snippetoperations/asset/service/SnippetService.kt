@@ -1,6 +1,7 @@
 package ingsis.group12.snippetoperations.asset.service
 
 import ingsis.group12.snippetoperations.asset.dto.PermissionDTO
+import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
 import ingsis.group12.snippetoperations.asset.model.Snippet
@@ -76,6 +77,19 @@ class SnippetService(
             }
         }
         throw SnippetNotFoundError("Snippet not found")
+    }
+
+    override fun shareAsset(
+        userId: String,
+        shareDTO: ShareDTO,
+    ) {
+        val result = snippetRepository.findById(shareDTO.assetId)
+        val userPermission = permissionService.getUserPermissionByAssetId(shareDTO.assetId, userId)
+        if (result.isPresent && userPermission.body!!.permission == "owner") {
+            permissionService.create(shareDTO.userId, shareDTO.assetId, PermissionDTO("read:write"))
+        } else {
+            throw SnippetNotFoundError("Snippet not found")
+        }
     }
 
     private fun saveSnippet(

@@ -1,5 +1,6 @@
 package ingsis.group12.snippetoperations.service
 
+import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
 import ingsis.group12.snippetoperations.asset.model.Snippet
 import ingsis.group12.snippetoperations.asset.repository.SnippetRepository
@@ -10,12 +11,14 @@ import ingsis.group12.snippetoperations.exception.SnippetNotFoundError
 import ingsis.group12.snippetoperations.mock.MockObjectStoreService
 import ingsis.group12.snippetoperations.mock.MockObjectStoreServiceWithConflict
 import ingsis.group12.snippetoperations.mock.MockPermissionService
+import ingsis.group12.snippetoperations.mock.MockPermissionServiceAsNotOwner
 import ingsis.group12.snippetoperations.mock.MockPermissionServiceWithBadResponse
 import ingsis.group12.snippetoperations.permission.service.PermissionService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.any
@@ -146,6 +149,44 @@ class SnippetServiceTest {
 
         assertThrows<SnippetNotFoundError> {
             snippetService.deleteAssetById(snippetId)
+        }
+    }
+
+    @Test
+    fun `shareAsset should share a snippet when it exists`() {
+        val userId = "user1"
+        val shareDTO = ShareDTO(UUID.randomUUID(), userId)
+        val snippetId = UUID.randomUUID()
+        val snippet = Snippet(snippetId, "test", "java", ".java")
+
+        `when`(snippetRepository.findById(any())).thenReturn(Optional.of(snippet))
+        assertDoesNotThrow { snippetService.shareAsset(userId, shareDTO) }
+    }
+
+    @Test
+    fun `shareAsset should throw an error when snippet does not exist`() {
+        val userId = "user1"
+        val shareDTO = ShareDTO(UUID.randomUUID(), userId)
+
+        `when`(snippetRepository.findById(any())).thenReturn(Optional.empty())
+
+        assertThrows<SnippetNotFoundError> {
+            snippetService.shareAsset(userId, shareDTO)
+        }
+    }
+
+    @Test
+    fun `shareAsset should fail when user is not owner of the asset`() {
+        snippetService = SnippetService(snippetRepository, objectStoreService, MockPermissionServiceAsNotOwner())
+        val userId = "user2"
+        val shareDTO = ShareDTO(UUID.randomUUID(), userId)
+        val snippetId = UUID.randomUUID()
+        val snippet = Snippet(snippetId, "test", "java", ".java")
+
+        `when`(snippetRepository.findById(any())).thenReturn(Optional.of(snippet))
+
+        assertThrows<Exception> {
+            snippetService.shareAsset(userId, shareDTO)
         }
     }
 }
