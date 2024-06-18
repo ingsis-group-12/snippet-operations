@@ -4,7 +4,6 @@ import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
 import ingsis.group12.snippetoperations.asset.service.SnippetService
-import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -24,10 +23,9 @@ import java.util.UUID
 @Tag(name = "Snippet")
 class SnippetController(
     private val snippetService: SnippetService,
-) {
+) : SnippetControllerSpec {
     @PostMapping()
-    @ApiResponse(responseCode = "200", description = "OK")
-    fun createSnippet(
+    override fun createSnippet(
         @Valid @RequestBody snippetInput: SnippetInput,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<SnippetDTO> {
@@ -37,14 +35,14 @@ class SnippetController(
     }
 
     @GetMapping()
-    @ApiResponse(responseCode = "200", description = "OK")
-    fun getSnippets(): ResponseEntity<List<SnippetDTO>> {
+    override fun getSnippets(
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<List<SnippetDTO>> {
         return ResponseEntity.ok(snippetService.getAssets())
     }
 
     @GetMapping("/{id}")
-    @ApiResponse(responseCode = "200", description = "OK")
-    fun getSnippetById(
+    override fun getSnippetById(
         @PathVariable("id") snippetId: UUID,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<SnippetDTO> {
@@ -53,21 +51,19 @@ class SnippetController(
     }
 
     @DeleteMapping("/{id}")
-    @ApiResponse(responseCode = "204", description = "OK")
-    fun deleteSnippetById(
+    override fun deleteSnippetById(
         @PathVariable("id") snippetId: UUID,
         @AuthenticationPrincipal jwt: Jwt,
-    ): ResponseEntity<String> {
-        val result = snippetService.deleteAssetById(snippetId)
-        return ResponseEntity.ok(result)
+    ): ResponseEntity<Void> {
+        snippetService.deleteAssetById(snippetId)
+        return ResponseEntity.noContent().build()
     }
 
     @PostMapping("/share")
-    @ApiResponse(responseCode = "204", description = "OK")
-    fun shareSnippet(
+    override fun shareSnippet(
         @Valid @RequestBody shareDTO: ShareDTO,
         @AuthenticationPrincipal jwt: Jwt,
-    ): ResponseEntity<SnippetDTO> {
+    ): ResponseEntity<Void> {
         val userId = jwt.subject
         snippetService.shareAsset(userId, shareDTO)
         return ResponseEntity.noContent().build()

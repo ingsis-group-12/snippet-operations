@@ -51,7 +51,7 @@ class SnippetControllerTest {
         val snippetDTOList = listOf(SnippetDTO(UUID.randomUUID(), "title", "content", "userId", "extension"))
         `when`(snippetService.getAssets()).thenReturn(snippetDTOList)
 
-        val result = snippetController.getSnippets()
+        val result = snippetController.getSnippets(jwt)
 
         assertEquals(HttpStatus.OK, result.statusCode)
         assertEquals(snippetDTOList, result.body)
@@ -76,6 +76,6 @@ class SnippetControllerTest {
 
         val result = snippetController.deleteSnippetById(snippetId, jwt)
 
-        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(HttpStatus.NO_CONTENT, result.statusCode)
     }
 }
