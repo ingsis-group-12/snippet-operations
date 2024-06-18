@@ -22,4 +22,6 @@ interface PermissionService {
         assetId: UUID,
         permission: PermissionDTO,
     ): ResponseEntity<Permission>
+
+    fun deletePermissionsByAssetId(assetId: UUID): ResponseEntity<Unit>
 }

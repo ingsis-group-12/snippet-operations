@@ -94,7 +94,7 @@ class SnippetServiceTest {
 
         `when`(snippetRepository.findById(any())).thenReturn(Optional.of(snippet))
 
-        val result = snippetService.deleteAssetById(snippetId)
+        val result = snippetService.deleteAssetById(snippetId, "user1")
 
         assertEquals("Snippet deleted with id $snippetId", result)
     }
@@ -138,17 +138,31 @@ class SnippetServiceTest {
         `when`(snippetRepository.findById(any())).thenReturn(Optional.empty())
 
         assertThrows<SnippetNotFoundError> {
-            snippetService.deleteAssetById(snippetId)
+            snippetService.deleteAssetById(snippetId, "user1")
         }
     }
 
     @Test
     fun `deleteAssetById should throw an error when storage deletion fails`() {
         val snippetId = UUID.randomUUID()
+        val userId = "user1"
         snippetService = SnippetService(snippetRepository, MockObjectStoreServiceWithConflict(), permissionService)
 
         assertThrows<SnippetNotFoundError> {
-            snippetService.deleteAssetById(snippetId)
+            snippetService.deleteAssetById(snippetId, userId)
+        }
+    }
+
+    @Test
+    fun `deleteAssetById as not owner should fail`() {
+        snippetService = SnippetService(snippetRepository, objectStoreService, MockPermissionServiceAsNotOwner())
+        val snippetId = UUID.randomUUID()
+        val snippet = Snippet(snippetId, "test", "java", ".java")
+
+        `when`(snippetRepository.findById(any())).thenReturn(Optional.of(snippet))
+
+        assertThrows<Exception> {
+            snippetService.deleteAssetById(snippetId, "user2")
         }
     }
 

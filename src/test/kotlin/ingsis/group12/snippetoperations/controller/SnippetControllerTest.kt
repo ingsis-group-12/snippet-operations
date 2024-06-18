@@ -72,7 +72,8 @@ class SnippetControllerTest {
     @Test
     fun `deleteSnippetById should return ResponseEntity with string when successful`() {
         val snippetId = UUID.randomUUID()
-        `when`(snippetService.deleteAssetById(snippetId)).thenReturn("Deleted")
+        `when`(jwt.subject).thenReturn("userId")
+        `when`(snippetService.deleteAssetById(snippetId, "userId")).thenReturn("Deleted")
 
         val result = snippetController.deleteSnippetById(snippetId, jwt)
 

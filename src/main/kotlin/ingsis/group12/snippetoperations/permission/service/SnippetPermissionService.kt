@@ -50,4 +50,10 @@ class SnippetPermissionService(
         val createdSnippetPermission = response.body
         return ResponseEntity(createdSnippetPermission, response.statusCode)
     }
+
+    override fun deletePermissionsByAssetId(assetId: UUID): ResponseEntity<Unit> {
+        val url = "$permissionUrl/$assetId"
+        restTemplate.delete(url)
+        return ResponseEntity.noContent().build()
+    }
 }

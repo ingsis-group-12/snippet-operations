@@ -65,11 +65,16 @@ class SnippetService(
         }
     }
 
-    override fun deleteAssetById(assetId: UUID): String {
+    override fun deleteAssetById(
+        assetId: UUID,
+        userId: String,
+    ): String {
         val result = snippetRepository.findById(assetId)
-        if (result.isPresent) {
-            val response = objectStoreService.delete(assetId)
-            if (response.statusCode.is2xxSuccessful) {
+        val isOwner = permissionService.getUserPermissionByAssetId(assetId, userId).body!!.permission == "owner"
+        if (result.isPresent && isOwner) {
+            val objectResponse = objectStoreService.delete(assetId)
+            val permissionsResponse = permissionService.deletePermissionsByAssetId(assetId)
+            if (objectResponse.statusCode.is2xxSuccessful && permissionsResponse.statusCode.is2xxSuccessful) {
                 snippetRepository.deleteById(assetId)
                 return "Snippet deleted with id $assetId"
             } else {

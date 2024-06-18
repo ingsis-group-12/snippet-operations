@@ -30,4 +30,8 @@ class MockPermissionService : PermissionService {
     ): ResponseEntity<Permission> {
         return ResponseEntity.ok(SnippetPermission(permission.permission, userId, assetId))
     }
+
+    override fun deletePermissionsByAssetId(assetId: UUID): ResponseEntity<Unit> {
+        return ResponseEntity.noContent().build()
+    }
 }

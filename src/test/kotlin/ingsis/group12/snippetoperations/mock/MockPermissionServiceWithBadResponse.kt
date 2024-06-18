@@ -29,4 +29,8 @@ class MockPermissionServiceWithBadResponse : PermissionService {
     ): ResponseEntity<Permission> {
         return ResponseEntity.badRequest().build()
     }
+
+    override fun deletePermissionsByAssetId(assetId: UUID): ResponseEntity<Unit> {
+        return ResponseEntity.noContent().build()
+    }
 }

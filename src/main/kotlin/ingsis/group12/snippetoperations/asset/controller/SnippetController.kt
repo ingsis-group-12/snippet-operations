@@ -55,7 +55,8 @@ class SnippetController(
         @PathVariable("id") snippetId: UUID,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Void> {
-        snippetService.deleteAssetById(snippetId)
+        val userId = jwt.subject
+        snippetService.deleteAssetById(snippetId, userId)
         return ResponseEntity.noContent().build()
     }
 

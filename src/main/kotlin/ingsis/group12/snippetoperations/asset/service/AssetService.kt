@@ -15,7 +15,10 @@ interface AssetService {
 
     fun getAssets(): List<Asset>
 
-    fun deleteAssetById(assetId: UUID): String
+    fun deleteAssetById(
+        assetId: UUID,
+        userId: String,
+    ): String
 
     fun shareAsset(
         userId: String,
