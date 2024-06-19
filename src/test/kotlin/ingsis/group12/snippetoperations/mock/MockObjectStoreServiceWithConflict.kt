@@ -20,4 +20,11 @@ class MockObjectStoreServiceWithConflict : ObjectStoreService {
     override fun delete(assetId: UUID): ResponseEntity<String> {
         return ResponseEntity("Conflict", HttpStatus.CONFLICT)
     }
+
+    override fun update(
+        content: String,
+        assetId: UUID,
+    ): ResponseEntity<String> {
+        return ResponseEntity("Conflict", HttpStatus.CONFLICT)
+    }
 }

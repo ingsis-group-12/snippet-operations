@@ -3,6 +3,7 @@ package ingsis.group12.snippetoperations.controller
 import ingsis.group12.snippetoperations.asset.controller.SnippetController
 import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
+import ingsis.group12.snippetoperations.asset.input.SnippetUpdateInput
 import ingsis.group12.snippetoperations.asset.service.SnippetService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -78,5 +79,19 @@ class SnippetControllerTest {
         val result = snippetController.deleteSnippetById(snippetId, jwt)
 
         assertEquals(HttpStatus.NO_CONTENT, result.statusCode)
+    }
+
+    @Test
+    fun `updateSnippet should return ResponseEntity with SnippetDTO when successful`() {
+        val snippetId = UUID.randomUUID()
+        val snippetUpdateInput = SnippetUpdateInput("title", "content")
+        val snippetDTO = SnippetDTO(snippetId, "title", "content", "userId", "extension")
+        `when`(jwt.subject).thenReturn("userId")
+        `when`(snippetService.updateAsset(snippetId, snippetUpdateInput, "userId")).thenReturn(snippetDTO)
+
+        val result = snippetController.updateSnippet(snippetId, snippetUpdateInput, jwt)
+
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(snippetDTO, result.body)
     }
 }

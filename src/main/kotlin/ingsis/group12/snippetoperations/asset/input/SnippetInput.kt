@@ -12,3 +12,10 @@ data class SnippetInput(
     @field:NotNull(message = "property type is missing")
     val extension: String,
 ) : AssetInput
+
+data class SnippetUpdateInput(
+    @field:NotNull(message = "name type is missing")
+    override val name: String,
+    @field:NotNull(message = "content type is missing")
+    override val content: String,
+) : AssetInput

@@ -11,5 +11,10 @@ interface ObjectStoreService {
 
     fun get(assetId: UUID): ResponseEntity<String>
 
+    fun update(
+        content: String,
+        assetId: UUID,
+    ): ResponseEntity<String>
+
     fun delete(assetId: UUID): ResponseEntity<String>
 }

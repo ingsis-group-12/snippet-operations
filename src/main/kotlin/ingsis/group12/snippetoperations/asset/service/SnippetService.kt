@@ -3,7 +3,9 @@ package ingsis.group12.snippetoperations.asset.service
 import ingsis.group12.snippetoperations.asset.dto.PermissionDTO
 import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
+import ingsis.group12.snippetoperations.asset.input.AssetInput
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
+import ingsis.group12.snippetoperations.asset.input.SnippetUpdateInput
 import ingsis.group12.snippetoperations.asset.model.Snippet
 import ingsis.group12.snippetoperations.asset.repository.SnippetRepository
 import ingsis.group12.snippetoperations.bucket.ObjectStoreService
@@ -21,15 +23,16 @@ class SnippetService(
     private val permissionService: PermissionService,
 ) : AssetService {
     override fun createAsset(
-        assetInput: SnippetInput,
+        assetInput: AssetInput,
         userId: String,
     ): SnippetDTO {
+        val input = assetInput as SnippetInput
         val snippetId = UUID.randomUUID()
         val permissionResponse = permissionService.create(userId, snippetId, PermissionDTO("owner"))
         if (permissionResponse.statusCode.is2xxSuccessful) {
-            val storageResponse = objectStoreService.create(assetInput.content, snippetId)
+            val storageResponse = objectStoreService.create(input.content, snippetId)
             if (storageResponse.statusCode.is2xxSuccessful) {
-                return saveSnippet(assetInput, snippetId)
+                return saveSnippet(input, snippetId)
             }
         }
         throw SnippetCreationError("Error while creating snippet")
@@ -63,6 +66,29 @@ class SnippetService(
                 it.extension!!,
             )
         }
+    }
+
+    override fun updateAsset(
+        assetId: UUID,
+        assetInput: AssetInput,
+        userId: String,
+    ): SnippetDTO {
+        val input = assetInput as SnippetUpdateInput
+        val result = snippetRepository.findById(assetId)
+        val isOwner = permissionService.getUserPermissionByAssetId(assetId, userId).body!!.permission == "owner"
+        if (result.isPresent && isOwner) {
+            val snippet = result.get()
+            snippetRepository.save(snippet)
+            objectStoreService.update(input.content, assetId)
+            return SnippetDTO(
+                assetId,
+                input.name,
+                input.content,
+                snippet.language!!,
+                snippet.extension!!,
+            )
+        }
+        throw SnippetNotFoundError("Snippet not found")
     }
 
     override fun deleteAssetById(

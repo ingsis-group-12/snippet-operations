@@ -19,4 +19,11 @@ class MockObjectStoreService : ObjectStoreService {
     override fun delete(assetId: UUID): ResponseEntity<String> {
         return ResponseEntity.ok("Asset deleted")
     }
+
+    override fun update(
+        content: String,
+        assetId: UUID,
+    ): ResponseEntity<String> {
+        return ResponseEntity.ok("Asset updated")
+    }
 }

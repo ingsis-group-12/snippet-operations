@@ -34,6 +34,17 @@ class AzureObjectStoreService(
         return restTemplate.getForEntity(url, String::class.java)
     }
 
+    override fun update(
+        content: String,
+        assetId: UUID,
+    ): ResponseEntity<String> {
+        val responseFromDelete = delete(assetId)
+        if (responseFromDelete.statusCode.is2xxSuccessful) {
+            return create(content, assetId)
+        }
+        return responseFromDelete
+    }
+
     override fun delete(assetId: UUID): ResponseEntity<String> {
         val url = "$bucketUrl/$assetId"
         return restTemplate.exchange(url, HttpMethod.DELETE, null, String::class.java)

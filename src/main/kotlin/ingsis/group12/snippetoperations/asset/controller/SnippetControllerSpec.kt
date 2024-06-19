@@ -3,6 +3,7 @@ package ingsis.group12.snippetoperations.asset.controller
 import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
+import ingsis.group12.snippetoperations.asset.input.SnippetUpdateInput
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import java.util.UUID
@@ -125,4 +127,39 @@ interface SnippetControllerSpec {
         @RequestBody shareDTO: ShareDTO,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Void>
+
+    @PutMapping("/{id}")
+    @Operation(
+        summary = "Update a snippet",
+        security = [SecurityRequirement(name = " Bearer Token")],
+        parameters = [
+            Parameter(
+                name = "id",
+                required = true,
+                description = "Snippet id",
+                example = "123e4567-e89b-12d3-a456-426614174000",
+            ),
+        ],
+        requestBody = RequestBodyDoc(content = [Content(schema = Schema(implementation = SnippetUpdateInput::class, required = true))]),
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = [Content(schema = Schema(implementation = SnippetDTO::class))],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Not Found when snippet not found",
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "Conflict when error while updating snippet",
+            ),
+        ],
+    )
+    fun updateSnippet(
+        @PathVariable("id") snippetId: UUID,
+        @RequestBody input: SnippetUpdateInput,
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<SnippetDTO>
 }

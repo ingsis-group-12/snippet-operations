@@ -2,6 +2,7 @@ package ingsis.group12.snippetoperations.service
 
 import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
+import ingsis.group12.snippetoperations.asset.input.SnippetUpdateInput
 import ingsis.group12.snippetoperations.asset.model.Snippet
 import ingsis.group12.snippetoperations.asset.repository.SnippetRepository
 import ingsis.group12.snippetoperations.asset.service.SnippetService
@@ -201,6 +202,33 @@ class SnippetServiceTest {
 
         assertThrows<Exception> {
             snippetService.shareAsset(userId, shareDTO)
+        }
+    }
+
+    @Test
+    fun `updateAsset should update a snippet when permissions and storage are successful`() {
+        val userId = "user1"
+        val snippetId = UUID.randomUUID()
+        val snippet = Snippet(snippetId, "test", "java", ".java")
+        val input = SnippetUpdateInput("test", "content 2 ")
+        `when`(snippetRepository.findById(snippetId)).thenReturn(Optional.of(snippet))
+        val result = snippetService.updateAsset(snippetId, input, userId)
+        assertNotNull(result.id)
+        assertEquals(snippet.name, result.name)
+        assertEquals(input.content, result.content)
+        assertEquals(snippet.language, result.language)
+        assertEquals(snippet.extension, result.extension)
+    }
+
+    @Test
+    fun `updateAsset should throw an error when permissions creation fails`() {
+        val userId = "user1"
+        val snippetId = UUID.randomUUID()
+        val input = SnippetUpdateInput("test", "content 2 ")
+        `when`(snippetRepository.findById(snippetId)).thenReturn(Optional.empty())
+        snippetService = SnippetService(snippetRepository, objectStoreService, MockPermissionService())
+        assertThrows<SnippetNotFoundError> {
+            snippetService.updateAsset(snippetId, input, userId)
         }
     }
 }
