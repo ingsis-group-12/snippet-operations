@@ -75,8 +75,7 @@ class SnippetService(
     ): SnippetDTO {
         val input = assetInput as SnippetUpdateInput
         val result = snippetRepository.findById(assetId)
-        val isOwner = permissionService.getUserPermissionByAssetId(assetId, userId).body!!.permission == "owner"
-        if (result.isPresent && isOwner) {
+        if (result.isPresent && isOwner(assetId, userId)) {
             val snippet = result.get()
             snippetRepository.save(snippet)
             objectStoreService.update(input.content, assetId)
@@ -96,8 +95,7 @@ class SnippetService(
         userId: String,
     ): String {
         val result = snippetRepository.findById(assetId)
-        val isOwner = permissionService.getUserPermissionByAssetId(assetId, userId).body!!.permission == "owner"
-        if (result.isPresent && isOwner) {
+        if (result.isPresent && isOwner(assetId, userId)) {
             val objectResponse = objectStoreService.delete(assetId)
             val permissionsResponse = permissionService.deletePermissionsByAssetId(assetId)
             if (objectResponse.statusCode.is2xxSuccessful && permissionsResponse.statusCode.is2xxSuccessful) {
@@ -115,8 +113,7 @@ class SnippetService(
         shareDTO: ShareDTO,
     ) {
         val result = snippetRepository.findById(shareDTO.assetId)
-        val userPermission = permissionService.getUserPermissionByAssetId(shareDTO.assetId, userId)
-        if (result.isPresent && userPermission.body!!.permission == "owner") {
+        if (result.isPresent && isOwner(shareDTO.assetId, userId)) {
             permissionService.create(shareDTO.userId, shareDTO.assetId, PermissionDTO("read"))
         } else {
             throw SnippetNotFoundError("Snippet not found")
@@ -143,4 +140,9 @@ class SnippetService(
             snippetInput.extension,
         )
     }
+
+    private fun isOwner(
+        assetId: UUID,
+        userId: String,
+    ) = permissionService.getUserPermissionByAssetId(assetId, userId).body!!.permission == "owner"
 }
