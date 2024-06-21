@@ -1,6 +1,6 @@
 package ingsis.group12.snippetoperations.exception
 
-import ingsis.group12.snippetoperations.model.ErrorMessage
+import ingsis.group12.snippetoperations.util.ErrorMessage
 import org.springframework.context.support.DefaultMessageSourceResolvable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.client.HttpClientErrorException
 import java.util.stream.Collectors
 
 @ControllerAdvice
@@ -33,4 +34,34 @@ class ExceptionControllerAdvice {
 
         return ResponseEntity(body, HttpStatus.BAD_REQUEST)
     }
+
+    @ExceptionHandler(SnippetCreationError::class)
+    fun handleSnippetCreationError(exception: SnippetCreationError): ResponseEntity<ErrorMessage> {
+        val error = ErrorMessage(exception.message, HttpStatus.CONFLICT.value())
+        return ResponseEntity(error, HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(SnippetNotFoundError::class)
+    fun handleSnippetNotFoundError(exception: SnippetNotFoundError): ResponseEntity<ErrorMessage> {
+        val error = ErrorMessage(exception.message, HttpStatus.NOT_FOUND.value())
+        return ResponseEntity(error, HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(SnippetDeleteError::class)
+    fun handleSnippetDeleteError(exception: SnippetDeleteError): ResponseEntity<ErrorMessage> {
+        val error = ErrorMessage(exception.message, HttpStatus.CONFLICT.value())
+        return ResponseEntity(error, HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(HttpClientErrorException.NotFound::class)
+    fun handleHttpClientErrorExceptionNotFound(exception: HttpClientErrorException.NotFound): ResponseEntity<ErrorMessage> {
+        val responseBody = exception.responseBodyAsString
+        val messageRegex = "\"message\":\\s*\"(.*?)\"".toRegex()
+        val matchResult = messageRegex.find(responseBody)
+        val error = ErrorMessage(removeUselessCharacters(matchResult), HttpStatus.NOT_FOUND.value())
+        return ResponseEntity(error, HttpStatus.NOT_FOUND)
+    }
+
+    private fun removeUselessCharacters(matchResult: MatchResult?) =
+        matchResult!!.value.replace("\\\"", "").replace("\"message\":\"", "").replace("\"", "")
 }
