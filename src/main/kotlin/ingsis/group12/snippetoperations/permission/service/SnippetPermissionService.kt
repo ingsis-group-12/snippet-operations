@@ -40,6 +40,13 @@ class SnippetPermissionService(
         return ResponseEntity(createdSnippetPermission, response.statusCode)
     }
 
+    override fun getUserPermissionsByUserId(userId: String): ResponseEntity<List<Permission>> {
+        val url = "$permissionUrl/user/$userId"
+        val response = restTemplate.getForEntity(url, Array<SnippetPermission>::class.java)
+        val createdSnippetPermission = response.body?.toList()
+        return ResponseEntity(createdSnippetPermission, response.statusCode)
+    }
+
     override fun updatePermission(
         userId: String,
         assetId: UUID,

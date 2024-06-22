@@ -12,8 +12,10 @@ import ingsis.group12.snippetoperations.bucket.ObjectStoreService
 import ingsis.group12.snippetoperations.exception.SnippetCreationError
 import ingsis.group12.snippetoperations.exception.SnippetDeleteError
 import ingsis.group12.snippetoperations.exception.SnippetNotFoundError
+import ingsis.group12.snippetoperations.permission.model.SnippetPermission
 import ingsis.group12.snippetoperations.permission.service.PermissionService
 import org.springframework.stereotype.Service
+import java.util.Date
 import java.util.UUID
 
 @Service
@@ -54,16 +56,19 @@ class SnippetService(
         throw SnippetNotFoundError("Snippet not found")
     }
 
-    override fun getAssets(): List<SnippetDTO> {
-        val snippets = snippetRepository.findAll()
-        return snippets.map {
-            val content = objectStoreService.get(it.id!!).body!!
+    override fun getAssets(userId: String): List<SnippetDTO> {
+        val permissions = permissionService.getUserPermissionsByUserId(userId).body!!
+        return permissions.map { permission ->
+            val snippetPermission = permission as SnippetPermission
+            val snippet = snippetRepository.findById(snippetPermission.assetId).get()
+            val content = objectStoreService.get(snippetPermission.assetId).body!!
+
             SnippetDTO(
-                it.id,
-                it.name!!,
+                permission.assetId,
+                snippet.name!!,
                 content,
-                it.language!!,
-                it.extension!!,
+                snippet.language!!,
+                snippet.extension!!,
             )
         }
     }
@@ -77,6 +82,7 @@ class SnippetService(
         val result = snippetRepository.findById(assetId)
         if (result.isPresent && isOwner(assetId, userId)) {
             val snippet = result.get()
+            snippet.updatedAt = Date()
             snippetRepository.save(snippet)
             objectStoreService.update(input.content, assetId)
             return SnippetDTO(

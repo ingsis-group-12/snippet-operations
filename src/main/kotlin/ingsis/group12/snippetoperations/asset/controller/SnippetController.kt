@@ -40,7 +40,8 @@ class SnippetController(
     override fun getSnippets(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<List<SnippetDTO>> {
-        return ResponseEntity.ok(snippetService.getAssets())
+        val userId = jwt.subject
+        return ResponseEntity.ok(snippetService.getAssets(userId))
     }
 
     @GetMapping("/{id}")

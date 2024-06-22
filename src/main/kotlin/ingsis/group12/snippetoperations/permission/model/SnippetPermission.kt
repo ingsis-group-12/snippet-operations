@@ -4,12 +4,9 @@ import java.util.UUID
 
 data class SnippetPermission(
     override val permission: String,
+    val snippetId: UUID,
     val userId: String,
-    val id: UUID,
 ) : Permission {
     override val assetId: UUID
         get() = snippetId
-
-    private val snippetId: UUID
-        get() = assetId
 }

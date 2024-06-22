@@ -22,6 +22,10 @@ class MockPermissionServiceWithBadResponse : PermissionService {
         return ResponseEntity.badRequest().build()
     }
 
+    override fun getUserPermissionsByUserId(userId: String): ResponseEntity<List<Permission>> {
+        return ResponseEntity.badRequest().build()
+    }
+
     override fun updatePermission(
         userId: String,
         assetId: UUID,

@@ -13,14 +13,23 @@ class MockPermissionService : PermissionService {
         assetId: UUID,
         permission: PermissionDTO,
     ): ResponseEntity<Permission> {
-        return ResponseEntity.ok(SnippetPermission(permission.permission, userId, assetId))
+        return ResponseEntity.ok(SnippetPermission(permission.permission, assetId, userId))
     }
 
     override fun getUserPermissionByAssetId(
         assetId: UUID,
         userId: String,
     ): ResponseEntity<Permission> {
-        return ResponseEntity.ok(SnippetPermission("owner", userId, assetId))
+        return ResponseEntity.ok(SnippetPermission("owner", assetId, userId))
+    }
+
+    override fun getUserPermissionsByUserId(userId: String): ResponseEntity<List<Permission>> {
+        return ResponseEntity.ok(
+            listOf(
+                SnippetPermission("owner", UUID.randomUUID(), userId),
+                SnippetPermission("viewer", UUID.randomUUID(), userId),
+            ),
+        )
     }
 
     override fun updatePermission(
@@ -28,7 +37,7 @@ class MockPermissionService : PermissionService {
         assetId: UUID,
         permission: PermissionDTO,
     ): ResponseEntity<Permission> {
-        return ResponseEntity.ok(SnippetPermission(permission.permission, userId, assetId))
+        return ResponseEntity.ok(SnippetPermission(permission.permission, assetId, userId))
     }
 
     override fun deletePermissionsByAssetId(assetId: UUID): ResponseEntity<Unit> {

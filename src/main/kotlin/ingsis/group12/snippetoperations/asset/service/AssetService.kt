@@ -13,7 +13,7 @@ interface AssetService {
 
     fun getAssetById(assetId: UUID): Asset
 
-    fun getAssets(): List<Asset>
+    fun getAssets(userId: String): List<Asset>
 
     fun deleteAssetById(
         assetId: UUID,
