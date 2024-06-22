@@ -77,13 +77,14 @@ class SnippetServiceTest {
     }
 
     @Test
-    fun `getAssets should return all snippets`() {
+    fun `getAssets by user id should return all snippets`() {
+        val userId = "user1"
         val snippet1 = Snippet(UUID.randomUUID(), "test1", "java", ".java")
         val snippet2 = Snippet(UUID.randomUUID(), "test2", "kotlin", ".kt")
 
-        `when`(snippetRepository.findAll()).thenReturn(listOf(snippet1, snippet2))
-
-        val result = snippetService.getAssets()
+        `when`(snippetRepository.findById(any())).thenReturn(Optional.of(snippet1))
+        `when`(snippetRepository.findById(any())).thenReturn(Optional.of(snippet2))
+        val result = snippetService.getAssets(userId)
 
         assertEquals(2, result.size)
     }

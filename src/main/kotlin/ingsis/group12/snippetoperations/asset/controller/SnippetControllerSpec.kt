@@ -43,7 +43,7 @@ interface SnippetControllerSpec {
 
     @GetMapping()
     @Operation(
-        summary = "Get all snippets",
+        summary = "Get all snippets where user has access to",
         security = [SecurityRequirement(name = "Bearer Token")],
         responses = [
             ApiResponse(

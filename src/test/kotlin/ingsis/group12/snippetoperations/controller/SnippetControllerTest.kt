@@ -49,8 +49,10 @@ class SnippetControllerTest {
 
     @Test
     fun `getSnippets should return ResponseEntity with list of SnippetDTO when successful`() {
+        val userId = "userId"
         val snippetDTOList = listOf(SnippetDTO(UUID.randomUUID(), "title", "content", "userId", "extension"))
-        `when`(snippetService.getAssets()).thenReturn(snippetDTOList)
+        `when`(jwt.subject).thenReturn("userId")
+        `when`(snippetService.getAssets(userId)).thenReturn(snippetDTOList)
 
         val result = snippetController.getSnippets(jwt)
 

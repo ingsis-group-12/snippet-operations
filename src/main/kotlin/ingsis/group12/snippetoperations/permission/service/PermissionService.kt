@@ -17,6 +17,8 @@ interface PermissionService {
         userId: String,
     ): ResponseEntity<Permission>
 
+    fun getUserPermissionsByUserId(userId: String): ResponseEntity<List<Permission>>
+
     fun updatePermission(
         userId: String,
         assetId: UUID,
