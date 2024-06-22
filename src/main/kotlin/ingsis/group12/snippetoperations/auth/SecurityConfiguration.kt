@@ -15,6 +15,9 @@ import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
@@ -39,7 +42,7 @@ class SecurityConfiguration(
         }
             .oauth2ResourceServer { it.jwt(withDefaults()) }
             .cors {
-                it.disable()
+                it.configurationSource(corsConfigurationSource())
             }
             .csrf {
                 it.disable()
@@ -55,5 +58,19 @@ class SecurityConfiguration(
         val withAudience: OAuth2TokenValidator<Jwt> = DelegatingOAuth2TokenValidator(withIssuer, audienceValidator)
         jwtDecoder.setJwtValidator(withAudience)
         return jwtDecoder
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val config =
+            CorsConfiguration().apply {
+                allowCredentials = true
+                addAllowedOrigin("*") // Adjust this based on your security requirements
+                addAllowedHeader("*")
+                addAllowedMethod("*")
+            }
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", config)
+        return source
     }
 }
