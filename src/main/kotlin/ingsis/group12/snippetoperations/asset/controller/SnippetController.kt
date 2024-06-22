@@ -24,7 +24,7 @@ import java.util.UUID
 @RestController
 @RequestMapping("/snippet")
 @Tag(name = "Snippet")
-@CrossOrigin(origins = ["*"])
+@CrossOrigin("*")
 class SnippetController(
     private val snippetService: SnippetService,
 ) : SnippetControllerSpec {
