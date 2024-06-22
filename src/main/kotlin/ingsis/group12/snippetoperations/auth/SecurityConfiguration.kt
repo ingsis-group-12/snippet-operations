@@ -66,6 +66,7 @@ class SecurityConfiguration(
             CorsConfiguration().apply {
                 allowCredentials = true
                 addAllowedOrigin("*") // Adjust this based on your security requirements
+                addAllowedOriginPattern("*")
                 addAllowedHeader("*")
                 addAllowedMethod("*")
             }
