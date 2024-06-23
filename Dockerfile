@@ -7,6 +7,7 @@ FROM openjdk:17-jdk-slim
 EXPOSE 8081
 
 RUN apt-get update && apt-get install -y unzip
+RUN apk --no-cache add curl
 
 # Add New Relic agent
 RUN mkdir /newrelic
