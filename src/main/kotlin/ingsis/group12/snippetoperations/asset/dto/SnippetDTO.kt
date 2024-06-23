@@ -9,4 +9,6 @@ data class SnippetDTO(
     override val content: String,
     val language: String,
     val extension: String,
+    val userName: String? = null,
+    val userId: String? = null,
 ) : Asset

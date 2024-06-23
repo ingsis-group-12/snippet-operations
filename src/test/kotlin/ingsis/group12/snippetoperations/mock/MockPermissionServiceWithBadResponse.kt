@@ -2,6 +2,7 @@ package ingsis.group12.snippetoperations.mock
 
 import ingsis.group12.snippetoperations.asset.dto.PermissionDTO
 import ingsis.group12.snippetoperations.permission.model.Permission
+import ingsis.group12.snippetoperations.permission.model.UserWithoutPermission
 import ingsis.group12.snippetoperations.permission.service.PermissionService
 import org.springframework.http.ResponseEntity
 import java.util.UUID
@@ -35,6 +36,13 @@ class MockPermissionServiceWithBadResponse : PermissionService {
     }
 
     override fun deletePermissionsByAssetId(assetId: UUID): ResponseEntity<Unit> {
-        return ResponseEntity.noContent().build()
+        return ResponseEntity.badRequest().build()
+    }
+
+    override fun getUsersWhoNotHavePermissionWithAsset(
+        assetId: UUID,
+        userId: String,
+    ): ResponseEntity<List<UserWithoutPermission>> {
+        return ResponseEntity.badRequest().build()
     }
 }

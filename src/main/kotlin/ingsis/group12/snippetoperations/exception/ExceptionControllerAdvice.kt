@@ -62,6 +62,12 @@ class ExceptionControllerAdvice {
         return ResponseEntity(error, HttpStatus.NOT_FOUND)
     }
 
+    @ExceptionHandler(SnippetShareError::class)
+    fun handleSnippetShareError(exception: SnippetShareError): ResponseEntity<ErrorMessage> {
+        val error = ErrorMessage(exception.message, HttpStatus.CONFLICT.value())
+        return ResponseEntity(error, HttpStatus.CONFLICT)
+    }
+
     private fun removeUselessCharacters(matchResult: MatchResult?) =
         matchResult!!.value.replace("\\\"", "").replace("\"message\":\"", "").replace("\"", "")
 }

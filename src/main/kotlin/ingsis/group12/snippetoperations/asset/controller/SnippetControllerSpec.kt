@@ -2,6 +2,7 @@ package ingsis.group12.snippetoperations.asset.controller
 
 import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
+import ingsis.group12.snippetoperations.asset.dto.UserShareDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
 import ingsis.group12.snippetoperations.asset.input.SnippetUpdateInput
 import io.swagger.v3.oas.annotations.Operation
@@ -162,4 +163,37 @@ interface SnippetControllerSpec {
         @RequestBody input: SnippetUpdateInput,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<SnippetDTO>
+
+    @GetMapping("/share/{id}")
+    @Operation(
+        summary = "Get users to share a snippet with",
+        security = [SecurityRequirement(name = "Bearer Token")],
+        parameters = [
+            Parameter(
+                name = "id",
+                required = true,
+                description = "Snippet id",
+                example = "123e4567-e89b-12d3-a456-426614174000",
+            ),
+        ],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = arrayOf(Content(schema = Schema(implementation = UserShareDTO::class))),
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Not Found when snippet not found",
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "Conflict when error while retrieving users",
+            ),
+        ],
+    )
+    fun getSharedSnippet(
+        @PathVariable("id") snippetId: UUID,
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<List<UserShareDTO>>
 }

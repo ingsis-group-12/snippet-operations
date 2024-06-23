@@ -11,6 +11,8 @@ data class SnippetInput(
     val language: String,
     @field:NotNull(message = "property type is missing")
     val extension: String,
+    @field:NotNull(message = "userName inputs is missing")
+    val userName: String,
 ) : AssetInput
 
 data class SnippetUpdateInput(

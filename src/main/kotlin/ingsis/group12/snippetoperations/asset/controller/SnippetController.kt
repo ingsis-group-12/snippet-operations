@@ -2,6 +2,7 @@ package ingsis.group12.snippetoperations.asset.controller
 
 import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
+import ingsis.group12.snippetoperations.asset.dto.UserShareDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
 import ingsis.group12.snippetoperations.asset.input.SnippetUpdateInput
 import ingsis.group12.snippetoperations.asset.service.SnippetService
@@ -73,6 +74,16 @@ class SnippetController(
         val userId = jwt.subject
         snippetService.shareAsset(userId, shareDTO)
         return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/share/{id}")
+    override fun getSharedSnippet(
+        @PathVariable("id") snippetId: UUID,
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<List<UserShareDTO>> {
+        val userId = jwt.subject
+        val result = snippetService.getUsersToShareSnippetWith(snippetId, userId)
+        return ResponseEntity.ok(result)
     }
 
     @PutMapping("/{id}")
