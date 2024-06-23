@@ -1,6 +1,7 @@
 package ingsis.group12.snippetoperations.testcase.controller
 import ingsis.group12.snippetoperations.testcase.dto.TestCaseDTO
 import ingsis.group12.snippetoperations.testcase.dto.TestCaseResponseDTO
+import ingsis.group12.snippetoperations.testcase.dto.TestCaseResultDTO
 import ingsis.group12.snippetoperations.testcase.service.TestCaseService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -30,7 +31,7 @@ class TestController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<TestCaseResponseDTO> {
         val response = testCaseService.createTestCase(snippetId, testCaseDTO)
-        return ResponseEntity.ok(response)
+        return ResponseEntity.ok().body(response)
     }
 
     @GetMapping("/{snippetId}")
@@ -39,7 +40,7 @@ class TestController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<List<TestCaseResponseDTO>> {
         val response = testCaseService.getTestCasesBySnippetId(snippetId)
-        return ResponseEntity.ok(response)
+        return ResponseEntity.ok().body(response)
     }
 
     @PutMapping("/{testCaseId}")
@@ -49,7 +50,7 @@ class TestController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<TestCaseDTO> {
         val response = testCaseService.updateTestCase(testCaseId, testCaseDTO)
-        return ResponseEntity.ok(response)
+        return ResponseEntity.ok().body(response)
     }
 
     @DeleteMapping("/{testCaseId}")
@@ -59,5 +60,14 @@ class TestController(
     ): ResponseEntity<String> {
         testCaseService.deleteTestCase(testCaseId)
         return ResponseEntity.noContent().build()
+    }
+
+    @PostMapping("/run/{testCaseId}")
+    fun runTestCase(
+        @PathVariable("testCaseId") testCaseId: UUID,
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<TestCaseResultDTO> {
+        val response = testCaseService.runTestCase(testCaseId)
+        return ResponseEntity.ok().body(response)
     }
 }

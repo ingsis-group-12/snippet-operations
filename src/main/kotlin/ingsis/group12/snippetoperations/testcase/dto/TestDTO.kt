@@ -21,6 +21,11 @@ data class TestCaseResponseDTO(
     val environment: List<EnvironmentInput>,
 )
 
+data class TestCaseResultDTO(
+    val passed: Boolean,
+    val error: String?,
+)
+
 data class EnvironmentInput(
     val key: String,
     val value: String,
