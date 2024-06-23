@@ -16,7 +16,7 @@ services:
       PERMISSIONS_URL: ${PERMISSIONS_URL}
       RUNNER_URL: ${RUNNER_URL}
       NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
-      NEW_RELIC_AGENT_ENABLED: ${NEW_RELIC_AGENT_ENABLED}
+      NEW_RELIC_AGENT_ENABLED: false
     depends_on:
         - asset-service
         - postgres-operations
@@ -41,7 +41,7 @@ services:
       - "8080:8080"
     environment:
       AZURE_HOST: "http://azurite"
-      NEW_RELIC_AGENT_ENABLED: ${NEW_RELIC_AGENT_ENABLED}
+      NEW_RELIC_AGENT_ENABLED: false
 
   azurite:
       container_name: "azurite"
