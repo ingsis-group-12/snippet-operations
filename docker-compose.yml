@@ -1,31 +1,33 @@
 services:
-  api:
+  operations-api:
     container_name: "operations-api"
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
-    expose:
-      - 8081
-    env_file:
-      - .env
+    environment:
+      BUCKET_URL: ${BUCKET_URL}
+      POSTGRES_OPERATIONS_PORT: ${POSTGRES_OPERATIONS_PORT}
+      PERMISSIONS_URL: ${PERMISSIONS_URL}
+    depends_on:
+        - asset_service_dev
+        - postgres
 
   postgres:
+    container_name: "postgres"
     image: postgres:alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    env_file:
-      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  asset_service_dev:
-    container_name: "asset_service_dev"
+  asset-service:
+    container_name: "asset-service"
     image: ghcr.io/austral-ingsis/snippet-asset-service:latest
     ports:
       - "8080:8080"
@@ -33,9 +35,9 @@ services:
       AZURE_HOST: "http://azurite"
       NEW_RELIC_AGENT_ENABLED: false
 
-  azurite_dev:
+  azurite:
+      container_name: "azurite"
       image: mcr.microsoft.com/azure-storage/azurite
-      container_name: "azurite_dev"
       hostname: azurite
       restart: always
       ports:
@@ -44,7 +46,6 @@ services:
         - "10002:10002"
       volumes:
         - blob:/workspace
-
 
 volumes:
   postgres-data:
