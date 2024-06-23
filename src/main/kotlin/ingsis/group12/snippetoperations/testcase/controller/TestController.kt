@@ -3,6 +3,7 @@ import ingsis.group12.snippetoperations.testcase.dto.TestCaseDTO
 import ingsis.group12.snippetoperations.testcase.dto.TestCaseResponseDTO
 import ingsis.group12.snippetoperations.testcase.dto.TestCaseResultDTO
 import ingsis.group12.snippetoperations.testcase.service.TestCaseService
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -20,6 +21,7 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/test")
+@Tag(name = "Test")
 @CrossOrigin("*")
 class TestController(
     private val testCaseService: TestCaseService,
