@@ -20,3 +20,6 @@ springdoc:
   api-docs:
     enabled: true
     path: "/docs"
+
+server:
+  forward-headers-strategy: framework
