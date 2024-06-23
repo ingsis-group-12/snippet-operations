@@ -3,6 +3,7 @@ package ingsis.group12.snippetoperations.asset.service
 import ingsis.group12.snippetoperations.asset.dto.PermissionDTO
 import ingsis.group12.snippetoperations.asset.dto.ShareDTO
 import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
+import ingsis.group12.snippetoperations.asset.dto.UserShareDTO
 import ingsis.group12.snippetoperations.asset.input.AssetInput
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
 import ingsis.group12.snippetoperations.asset.input.SnippetUpdateInput
@@ -12,6 +13,7 @@ import ingsis.group12.snippetoperations.bucket.ObjectStoreService
 import ingsis.group12.snippetoperations.exception.SnippetCreationError
 import ingsis.group12.snippetoperations.exception.SnippetDeleteError
 import ingsis.group12.snippetoperations.exception.SnippetNotFoundError
+import ingsis.group12.snippetoperations.exception.SnippetShareError
 import ingsis.group12.snippetoperations.permission.model.SnippetPermission
 import ingsis.group12.snippetoperations.permission.service.PermissionService
 import org.springframework.stereotype.Service
@@ -30,11 +32,11 @@ class SnippetService(
     ): SnippetDTO {
         val input = assetInput as SnippetInput
         val snippetId = UUID.randomUUID()
-        val permissionResponse = permissionService.create(userId, snippetId, PermissionDTO("owner"))
+        val permissionResponse = permissionService.create(userId, snippetId, PermissionDTO("owner", input.userName))
         if (permissionResponse.statusCode.is2xxSuccessful) {
             val storageResponse = objectStoreService.create(input.content, snippetId)
             if (storageResponse.statusCode.is2xxSuccessful) {
-                return saveSnippet(input, snippetId)
+                return saveSnippet(input, snippetId, userId)
             }
         }
         throw SnippetCreationError("Error while creating snippet")
@@ -69,6 +71,8 @@ class SnippetService(
                 content,
                 snippet.language!!,
                 snippet.extension!!,
+                snippetPermission.userName,
+                snippetPermission.userId,
             )
         }
     }
@@ -120,15 +124,34 @@ class SnippetService(
     ) {
         val result = snippetRepository.findById(shareDTO.assetId)
         if (result.isPresent && isOwner(shareDTO.assetId, userId)) {
-            permissionService.create(shareDTO.userId, shareDTO.assetId, PermissionDTO("read"))
+            permissionService.create(shareDTO.userId, shareDTO.assetId, PermissionDTO("read", shareDTO.userName))
         } else {
             throw SnippetNotFoundError("Snippet not found")
+        }
+    }
+
+    fun getUsersToShareSnippetWith(
+        snippetId: UUID,
+        ownerId: String,
+    ): List<UserShareDTO> {
+        val result = snippetRepository.findById(snippetId)
+        if (result.isEmpty) {
+            throw SnippetNotFoundError("Snippet not found")
+        }
+        if (isOwner(snippetId, ownerId)) {
+            val permissions = permissionService.getUsersWhoNotHavePermissionWithAsset(snippetId, ownerId).body!!
+            return permissions.map { permission ->
+                UserShareDTO(permission.userId, permission.userName)
+            }
+        } else {
+            throw SnippetShareError("You are not the owner of the snippet")
         }
     }
 
     private fun saveSnippet(
         snippetInput: SnippetInput,
         snippetId: UUID,
+        userId: String,
     ): SnippetDTO {
         snippetRepository.save(
             Snippet(
@@ -144,6 +167,8 @@ class SnippetService(
             snippetInput.content,
             snippetInput.language,
             snippetInput.extension,
+            snippetInput.userName,
+            userId,
         )
     }
 

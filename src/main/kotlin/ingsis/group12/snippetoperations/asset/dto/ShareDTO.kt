@@ -5,4 +5,10 @@ import java.util.UUID
 data class ShareDTO(
     val assetId: UUID,
     val userId: String,
+    val userName: String,
+)
+
+data class UserShareDTO(
+    val userId: String,
+    val userName: String,
 )

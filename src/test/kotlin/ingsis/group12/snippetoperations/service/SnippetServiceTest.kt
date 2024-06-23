@@ -48,7 +48,7 @@ class SnippetServiceTest {
 
     @Test
     fun `createAsset should create a new snippet when permissions and storage are successful`() {
-        val snippetInput = SnippetInput("test", "content", "java", ".java")
+        val snippetInput = SnippetInput("test", "content", "java", ".java", "userName")
         val userId = "user1"
 
         val result = snippetService.createAsset(snippetInput, userId)
@@ -103,7 +103,7 @@ class SnippetServiceTest {
 
     @Test
     fun `createAsset should throw an error when permissions creation fails`() {
-        val snippetInput = SnippetInput("test", "content", "java", ".java")
+        val snippetInput = SnippetInput("test", "content", "java", ".java", "userName")
         val userId = "user1"
         snippetService = SnippetService(snippetRepository, objectStoreService, MockPermissionServiceWithBadResponse())
         assertThrows<SnippetCreationError> {
@@ -113,7 +113,7 @@ class SnippetServiceTest {
 
     @Test
     fun `createAsset should throw an error when storage creation fails`() {
-        val snippetInput = SnippetInput("test", "content", "java", ".java")
+        val snippetInput = SnippetInput("test", "content", "java", ".java", "userName")
         val userId = "user1"
 
         snippetService = SnippetService(snippetRepository, MockObjectStoreServiceWithConflict(), permissionService)
@@ -171,7 +171,7 @@ class SnippetServiceTest {
     @Test
     fun `shareAsset should share a snippet when it exists`() {
         val userId = "user1"
-        val shareDTO = ShareDTO(UUID.randomUUID(), userId)
+        val shareDTO = ShareDTO(UUID.randomUUID(), userId, "userName")
         val snippetId = UUID.randomUUID()
         val snippet = Snippet(snippetId, "test", "java", ".java")
 
@@ -182,7 +182,7 @@ class SnippetServiceTest {
     @Test
     fun `shareAsset should throw an error when snippet does not exist`() {
         val userId = "user1"
-        val shareDTO = ShareDTO(UUID.randomUUID(), userId)
+        val shareDTO = ShareDTO(UUID.randomUUID(), userId, "userName")
 
         `when`(snippetRepository.findById(any())).thenReturn(Optional.empty())
 
@@ -195,7 +195,7 @@ class SnippetServiceTest {
     fun `shareAsset should fail when user is not owner of the asset`() {
         snippetService = SnippetService(snippetRepository, objectStoreService, MockPermissionServiceAsNotOwner())
         val userId = "user2"
-        val shareDTO = ShareDTO(UUID.randomUUID(), userId)
+        val shareDTO = ShareDTO(UUID.randomUUID(), userId, "userName")
         val snippetId = UUID.randomUUID()
         val snippet = Snippet(snippetId, "test", "java", ".java")
 

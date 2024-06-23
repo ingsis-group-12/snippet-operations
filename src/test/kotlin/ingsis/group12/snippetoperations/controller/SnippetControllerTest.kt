@@ -36,7 +36,7 @@ class SnippetControllerTest {
 
     @Test
     fun `createSnippet should return ResponseEntity with SnippetDTO when successful`() {
-        val snippetInput = SnippetInput("title", "content", "language", "extension")
+        val snippetInput = SnippetInput("title", "content", "language", "extension", "userName")
         val snippetDTO = SnippetDTO(UUID.randomUUID(), "title", "content", "userId", "extension")
         `when`(jwt.subject).thenReturn("userId")
         `when`(snippetService.createAsset(snippetInput, "userId")).thenReturn(snippetDTO)

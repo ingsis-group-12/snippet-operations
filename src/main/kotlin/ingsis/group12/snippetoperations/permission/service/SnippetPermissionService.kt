@@ -3,6 +3,7 @@ package ingsis.group12.snippetoperations.permission.service
 import ingsis.group12.snippetoperations.asset.dto.PermissionDTO
 import ingsis.group12.snippetoperations.permission.model.Permission
 import ingsis.group12.snippetoperations.permission.model.SnippetPermission
+import ingsis.group12.snippetoperations.permission.model.UserWithoutPermission
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
@@ -43,6 +44,16 @@ class SnippetPermissionService(
     override fun getUserPermissionsByUserId(userId: String): ResponseEntity<List<Permission>> {
         val url = "$permissionUrl/user/$userId"
         val response = restTemplate.getForEntity(url, Array<SnippetPermission>::class.java)
+        val createdSnippetPermission = response.body?.toList()
+        return ResponseEntity(createdSnippetPermission, response.statusCode)
+    }
+
+    override fun getUsersWhoNotHavePermissionWithAsset(
+        assetId: UUID,
+        userId: String,
+    ): ResponseEntity<List<UserWithoutPermission>> {
+        val url = "$permissionUrl/snippet/$assetId/user/$userId"
+        val response = restTemplate.getForEntity(url, Array<UserWithoutPermission>::class.java)
         val createdSnippetPermission = response.body?.toList()
         return ResponseEntity(createdSnippetPermission, response.statusCode)
     }
