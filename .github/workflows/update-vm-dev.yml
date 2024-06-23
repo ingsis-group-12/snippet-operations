@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: pull updated images [ dev VM ]
     runs-on: ubuntu-latest
     steps:
       - name: executing remote ssh commands using password
