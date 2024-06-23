@@ -11,7 +11,7 @@ services:
       POSTGRES_OPERATIONS_PORT: ${POSTGRES_OPERATIONS_PORT}
       PERMISSIONS_URL: ${PERMISSIONS_URL}
     depends_on:
-        - asset_service_dev
+        - asset-service
         - postgres
 
   postgres:
