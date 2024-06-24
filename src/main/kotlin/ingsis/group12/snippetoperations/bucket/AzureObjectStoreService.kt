@@ -13,7 +13,7 @@ import java.util.UUID
 
 @Service
 class AzureObjectStoreService(
-    @Value("\${bucket.url}") private val bucketUrl: String,
+    @Value("\${snippet.bucket.url}") private val bucketUrl: String,
 ) : ObjectStoreService {
     @Autowired
     private lateinit var restTemplate: RestTemplate

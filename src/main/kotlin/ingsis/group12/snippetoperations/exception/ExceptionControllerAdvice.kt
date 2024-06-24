@@ -68,6 +68,18 @@ class ExceptionControllerAdvice {
         return ResponseEntity(error, HttpStatus.CONFLICT)
     }
 
+    @ExceptionHandler(SnippetPermissionError::class)
+    fun handleSnippetPermissionError(exception: SnippetPermissionError): ResponseEntity<ErrorMessage> {
+        val error = ErrorMessage(exception.message, HttpStatus.CONFLICT.value())
+        return ResponseEntity(error, HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(SnippetRuleError::class)
+    fun handleSnippetRuleError(exception: SnippetRuleError): ResponseEntity<ErrorMessage> {
+        val error = ErrorMessage(exception.message, HttpStatus.CONFLICT.value())
+        return ResponseEntity(error, HttpStatus.CONFLICT)
+    }
+
     private fun removeUselessCharacters(matchResult: MatchResult?) =
         matchResult!!.value.replace("\\\"", "").replace("\"message\":\"", "").replace("\"", "")
 }

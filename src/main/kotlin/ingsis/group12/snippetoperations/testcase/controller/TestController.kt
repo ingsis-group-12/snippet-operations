@@ -69,7 +69,8 @@ class TestController(
         @PathVariable("testCaseId") testCaseId: UUID,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<TestCaseResultDTO> {
-        val response = testCaseService.runTestCase(testCaseId)
+        val userId = jwt.subject
+        val response = testCaseService.runTestCase(testCaseId, jwt.subject)
         return ResponseEntity.ok().body(response)
     }
 }

@@ -16,11 +16,11 @@ services:
       RUNNER_URL: ${RUNNER_URL}
       NEW_RELIC_AGENT_ENABLED: false
     depends_on:
-        - asset-service
-        - postgres-operations
+        - asset_service_dev
+        - postgres
 
-  postgres-operations:
-    container_name: "postgres-operations"
+  postgres:
+    container_name: "postgres"
     image: postgres:latest
     restart: always
     ports:
@@ -32,8 +32,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  asset-service:
-    container_name: "asset-service"
+  asset_service_dev:
+    container_name: "asset_service_dev"
     image: ghcr.io/austral-ingsis/snippet-asset-service:latest
     ports:
       - "8080:8080"
@@ -41,8 +41,8 @@ services:
       AZURE_HOST: "http://azurite"
       NEW_RELIC_AGENT_ENABLED: false
 
-  azurite:
-      container_name: "azurite"
+  azurite_dev:
+      container_name: "azurite_dev"
       image: mcr.microsoft.com/azure-storage/azurite
       hostname: azurite
       restart: always

@@ -3,6 +3,8 @@ package ingsis.group12.snippetoperations.testcase.service
 import ingsis.group12.snippetoperations.asset.repository.SnippetRepository
 import ingsis.group12.snippetoperations.bucket.ObjectStoreService
 import ingsis.group12.snippetoperations.exception.SnippetNotFoundError
+import ingsis.group12.snippetoperations.exception.SnippetPermissionError
+import ingsis.group12.snippetoperations.permission.service.PermissionService
 import ingsis.group12.snippetoperations.testcase.dto.EnvironmentInput
 import ingsis.group12.snippetoperations.testcase.dto.ExecutorInput
 import ingsis.group12.snippetoperations.testcase.dto.ExecutorOutput
@@ -23,10 +25,13 @@ class TestCaseService(
     private val testCaseRepository: TestCaseRepository,
     private val snippetRepository: SnippetRepository,
     private val objectStoreService: ObjectStoreService,
+    private val permissionService: PermissionService,
 ) {
     @Autowired
     private lateinit var restTemplate: RestTemplate
 
+    // TODO: Add implementation on bucket with this to store inputs,
+    // outputs and environment variables of test cases
     fun createTestCase(
         snippetId: UUID,
         testCaseDTO: TestCaseDTO,
@@ -80,8 +85,14 @@ class TestCaseService(
         testCaseRepository.deleteById(testCaseId)
     }
 
-    fun runTestCase(testCaseId: UUID): TestCaseResultDTO {
+    fun runTestCase(
+        testCaseId: UUID,
+        userId: String,
+    ): TestCaseResultDTO {
         val testCase = findTestCaseById(testCaseId)
+        if (canExecuteTestCase(testCase, userId)) {
+            throw SnippetPermissionError("User does not have permission to run this test case")
+        }
         val inputs = parseInputs(testCase.inputs)
         val expectedOutputs = parseOutputs(testCase.outputs)
         val environmentVariables = parseEnvironmentVariables(testCase.environmentVariables)
@@ -97,6 +108,14 @@ class TestCaseService(
         val executorOutput = executeTestCase(executorInput)
 
         return evaluateTestCaseResult(executorOutput, expectedOutputs)
+    }
+
+    private fun canExecuteTestCase(
+        testCase: TestCase,
+        userId: String,
+    ): Boolean {
+        val response = permissionService.getUserPermissionByAssetId(testCase.snippet!!.id!!, userId).body!!
+        return response.permission != "read"
     }
 
     private fun findTestCaseById(testCaseId: UUID): TestCase {
