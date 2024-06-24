@@ -21,7 +21,7 @@ services:
 
   postgres-operations:
     container_name: "postgres-operations"
-    image: postgres:latest
+    image: postgres:alpine
     restart: always
     ports:
       - "5433:5432"
