@@ -28,6 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-and-push-image:
+    needs: build
     runs-on: ubuntu-latest
 
     permissions:
@@ -62,7 +63,8 @@ jobs:
             NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }}
 
   deploy:
-    name: pull updated images [ prod VM ]
+    needs: build-and-push-image
+    name: pull updated images
     runs-on: ubuntu-latest
     steps:
       - name: executing remote ssh commands using password
