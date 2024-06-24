@@ -62,7 +62,7 @@ jobs:
             NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }}
 
   deploy:
-    name: pull updated images [ prod VM ]
+    name: pull updated images
     runs-on: ubuntu-latest
     steps:
       - name: executing remote ssh commands using password
