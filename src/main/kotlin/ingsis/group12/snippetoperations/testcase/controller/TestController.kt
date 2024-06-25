@@ -70,7 +70,7 @@ class TestController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<TestCaseResultDTO> {
         val userId = jwt.subject
-        val response = testCaseService.runTestCase(testCaseId, jwt.subject)
+        val response = testCaseService.runTestCase(testCaseId, userId)
         return ResponseEntity.ok().body(response)
     }
 }

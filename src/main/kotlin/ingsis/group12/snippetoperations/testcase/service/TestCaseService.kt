@@ -5,31 +5,26 @@ import ingsis.group12.snippetoperations.bucket.ObjectStoreService
 import ingsis.group12.snippetoperations.exception.SnippetNotFoundError
 import ingsis.group12.snippetoperations.exception.SnippetPermissionError
 import ingsis.group12.snippetoperations.permission.service.PermissionService
+import ingsis.group12.snippetoperations.runner.input.ExecutorInput
+import ingsis.group12.snippetoperations.runner.output.ExecutorOutput
+import ingsis.group12.snippetoperations.runner.service.RunnerService
 import ingsis.group12.snippetoperations.testcase.dto.EnvironmentInput
-import ingsis.group12.snippetoperations.testcase.dto.ExecutorInput
-import ingsis.group12.snippetoperations.testcase.dto.ExecutorOutput
 import ingsis.group12.snippetoperations.testcase.dto.TestCaseDTO
 import ingsis.group12.snippetoperations.testcase.dto.TestCaseResponseDTO
 import ingsis.group12.snippetoperations.testcase.dto.TestCaseResultDTO
 import ingsis.group12.snippetoperations.testcase.model.TestCase
 import ingsis.group12.snippetoperations.testcase.repository.TestCaseRepository
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
 import java.util.UUID
 
 @Service
 class TestCaseService(
-    @Value("\${runner.url}") private val runnerUrl: String,
     private val testCaseRepository: TestCaseRepository,
     private val snippetRepository: SnippetRepository,
     private val objectStoreService: ObjectStoreService,
+    private val runnerService: RunnerService,
     private val permissionService: PermissionService,
 ) {
-    @Autowired
-    private lateinit var restTemplate: RestTemplate
-
     // TODO: Add implementation on bucket with this to store inputs,
     // outputs and environment variables of test cases
     fun createTestCase(
@@ -105,7 +100,7 @@ class TestCaseService(
                 env = environmentVariables,
             )
 
-        val executorOutput = executeTestCase(executorInput)
+        val executorOutput = runnerService.execute(executorInput)
 
         return evaluateTestCaseResult(executorOutput, expectedOutputs)
     }
@@ -152,12 +147,6 @@ class TestCaseService(
 
     private fun getSnippetContent(snippetId: UUID): String {
         return objectStoreService.get(snippetId).body!!
-    }
-
-    private fun executeTestCase(executorInput: ExecutorInput): ExecutorOutput {
-        val executeUrl = "$runnerUrl/interpret"
-        val response = restTemplate.postForEntity(executeUrl, executorInput, ExecutorOutput::class.java)
-        return response.body!!
     }
 
     private fun evaluateTestCaseResult(

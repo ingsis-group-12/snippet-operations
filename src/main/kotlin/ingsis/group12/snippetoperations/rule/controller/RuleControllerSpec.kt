@@ -1,7 +1,10 @@
 package ingsis.group12.snippetoperations.rule.controller
 
 import ingsis.group12.snippetoperations.rule.dto.FormatterRules
-import ingsis.group12.snippetoperations.rule.dto.LinterRules
+import ingsis.group12.snippetoperations.rule.dto.LinterRuleInput
+import ingsis.group12.snippetoperations.rule.dto.RunRuleDTO
+import ingsis.group12.snippetoperations.runner.output.FormatterOutput
+import ingsis.group12.snippetoperations.runner.output.LinterOutput
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -26,31 +29,49 @@ interface RuleControllerSpec {
             ApiResponse(
                 responseCode = "200",
                 description = "OK",
-                content = [Content(schema = Schema(implementation = LinterRules::class))],
+                content = [Content(schema = Schema(implementation = LinterRuleInput::class))],
             ),
         ],
     )
     fun createOrGetLinterRules(
         @AuthenticationPrincipal jwt: Jwt,
-    ): ResponseEntity<LinterRules>
+    ): ResponseEntity<LinterRuleInput>
 
     @PutMapping("/linter")
     @Operation(
         summary = "Update a linter rule",
         security = [SecurityRequirement(name = "Bearer Token")],
-        requestBody = RequestBodyDoc(content = [Content(schema = Schema(implementation = LinterRules::class, required = true))]),
+        requestBody = RequestBodyDoc(content = [Content(schema = Schema(implementation = LinterRuleInput::class, required = true))]),
         responses = [
             ApiResponse(
                 responseCode = "200",
                 description = "OK",
-                content = [Content(schema = Schema(implementation = LinterRules::class))],
+                content = [Content(schema = Schema(implementation = LinterRuleInput::class))],
             ),
         ],
     )
     fun updateLinterRules(
         @AuthenticationPrincipal jwt: Jwt,
-        @RequestBody linterRules: LinterRules,
-    ): ResponseEntity<LinterRules>
+        @RequestBody linterRuleInput: LinterRuleInput,
+    ): ResponseEntity<LinterRuleInput>
+
+    @PostMapping("/linter/run")
+    @Operation(
+        summary = "Run a linter rule",
+        security = [SecurityRequirement(name = " Bearer Token")],
+        requestBody = RequestBodyDoc(content = [Content(schema = Schema(implementation = RunRuleDTO::class, required = true))]),
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = [Content(schema = Schema(implementation = LinterOutput::class))],
+            ),
+        ],
+    )
+    fun runLinterRules(
+        @AuthenticationPrincipal jwt: Jwt,
+        @RequestBody runRuleDTO: RunRuleDTO,
+    ): ResponseEntity<LinterOutput>
 
     @PostMapping("/formatter")
     @Operation(
@@ -85,4 +106,22 @@ interface RuleControllerSpec {
         @AuthenticationPrincipal jwt: Jwt,
         @RequestBody formatterRules: FormatterRules,
     ): ResponseEntity<FormatterRules>
+
+    @PostMapping("/formatter/run")
+    @Operation(
+        summary = "Run a formatter rule",
+        security = [SecurityRequirement(name = "Bearer Token")],
+        requestBody = RequestBodyDoc(content = [Content(schema = Schema(implementation = RunRuleDTO::class, required = true))]),
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = [Content(schema = Schema(implementation = FormatterOutput::class))],
+            ),
+        ],
+    )
+    fun runFormatterRules(
+        @AuthenticationPrincipal jwt: Jwt,
+        @RequestBody runRuleDTO: RunRuleDTO,
+    ): ResponseEntity<FormatterOutput>
 }

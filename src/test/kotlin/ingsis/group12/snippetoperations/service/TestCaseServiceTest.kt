@@ -5,6 +5,7 @@ import ingsis.group12.snippetoperations.asset.repository.SnippetRepository
 import ingsis.group12.snippetoperations.bucket.ObjectStoreService
 import ingsis.group12.snippetoperations.mock.MockObjectStoreService
 import ingsis.group12.snippetoperations.mock.MockPermissionService
+import ingsis.group12.snippetoperations.mock.MockRunnerService
 import ingsis.group12.snippetoperations.testcase.dto.EnvironmentInput
 import ingsis.group12.snippetoperations.testcase.dto.TestCaseDTO
 import ingsis.group12.snippetoperations.testcase.model.TestCase
@@ -45,7 +46,14 @@ class TestCaseServiceTest {
     @BeforeEach
     fun setUp() {
         mockServer = MockRestServiceServer.createServer(restTemplate)
-        testCaseService = TestCaseService("test", testCaseRepository, snippetRepository, objectStoreService, MockPermissionService())
+        testCaseService =
+            TestCaseService(
+                testCaseRepository,
+                snippetRepository,
+                objectStoreService,
+                MockRunnerService(),
+                MockPermissionService(),
+            )
     }
 
     @Test

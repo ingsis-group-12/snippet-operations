@@ -3,7 +3,6 @@ package ingsis.group12.snippetoperations.rule.util
 import ingsis.group12.snippetoperations.rule.dto.FormatterRuleInput
 import ingsis.group12.snippetoperations.rule.dto.FormatterRules
 import ingsis.group12.snippetoperations.rule.dto.LinterRuleInput
-import ingsis.group12.snippetoperations.rule.dto.LinterRules
 
 fun createDefaultFormatterRules(): FormatterRules {
     return FormatterRules(
@@ -17,20 +16,10 @@ fun createDefaultFormatterRules(): FormatterRules {
     )
 }
 
-fun createDefaultLinterRules(): LinterRules {
-    return LinterRules(
-        listOf(
-            LinterRuleInput(
-                enforcePrintlnRule = true,
-                enforceReadInputRule = true,
-                identifierRule = "snake_case",
-            ),
-        ),
+fun createDefaultLinterRules(): LinterRuleInput {
+    return LinterRuleInput(
+        enforceLiteralOrIdentifierInPrintlnRule = true,
+        enforceLiteralOrIdentifierInReadInputRule = true,
+        identifierRule = "snake_case",
     )
 }
-
-// {
-//    "enforce_literal_or_identifier_in_println_rule": true,
-//    "enforce_literal_or_identifier_in_read_input_rule": true,
-//    "identifier_rule": "snake_case"
-// }

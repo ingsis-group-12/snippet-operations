@@ -1,4 +1,6 @@
-package ingsis.group12.snippetoperations.testcase.dto
+package ingsis.group12.snippetoperations.runner.input
+
+import ingsis.group12.snippetoperations.testcase.dto.EnvironmentInput
 
 data class ExecutorInput(
     val content: String,
