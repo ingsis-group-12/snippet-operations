@@ -20,6 +20,14 @@ java {
 repositories {
 	gradlePluginPortal()
 	mavenCentral()
+	maven {
+		name = 'GitHubPackages'
+		url = uri("https://maven.pkg.github.com/austral-ingsis/class-redis-streams")
+		credentials {
+			username = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
+			password = project.findProperty('gpr.key') ?: System.getenv('GITHUB_TOKEN')
+		}
+	}
 }
 
 dependencies {
@@ -40,6 +48,8 @@ dependencies {
 	//OAuth2
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0'
+	implementation 'org.austral.ingsis:redis-streams-mvc:0.1.13'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive:+'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	runtimeOnly 'com.h2database:h2'

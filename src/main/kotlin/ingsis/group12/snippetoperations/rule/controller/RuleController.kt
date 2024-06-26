@@ -26,28 +26,28 @@ class RuleController(
 ) : RuleControllerSpec {
     @PostMapping("/linter")
     override fun createOrGetLinterRules(jwt: Jwt): ResponseEntity<LinterRuleInput> {
-        return ResponseEntity.ok(linterRuleService.createOrGetLinterRules(jwt.subject))
+        return ResponseEntity.ok(linterRuleService.createOrGetRules(jwt.subject))
     }
 
     @PutMapping("/linter")
-    override fun updateLinterRules(
+    override suspend fun updateLinterRules(
         jwt: Jwt,
         linterRuleInput: LinterRuleInput,
     ): ResponseEntity<LinterRuleInput> {
-        return ResponseEntity.ok(linterRuleService.updateLinterRules(jwt.subject, linterRuleInput))
+        return ResponseEntity.ok(linterRuleService.updateRules(jwt.subject, linterRuleInput))
     }
 
     @PostMapping("/formatter")
     override fun createOrGetFormatterRules(jwt: Jwt): ResponseEntity<FormatterRules> {
-        return ResponseEntity.ok(formatterRuleService.createOrGetFormatterRules(jwt.subject))
+        return ResponseEntity.ok(formatterRuleService.createOrGetRules(jwt.subject))
     }
 
     @PutMapping("/formatter")
-    override fun updateFormatterRules(
+    override suspend fun updateFormatterRules(
         jwt: Jwt,
         formatterRules: FormatterRules,
     ): ResponseEntity<FormatterRules> {
-        return ResponseEntity.ok(formatterRuleService.updateFormatterRules(jwt.subject, formatterRules))
+        return ResponseEntity.ok(formatterRuleService.updateRules(jwt.subject, formatterRules))
     }
 
     @PostMapping("/linter/run")
@@ -55,7 +55,7 @@ class RuleController(
         jwt: Jwt,
         runRuleDTO: RunRuleDTO,
     ): ResponseEntity<LinterOutput> {
-        return ResponseEntity.ok(linterRuleService.runLinterRules(jwt.subject, runRuleDTO))
+        return ResponseEntity.ok(linterRuleService.runRules(jwt.subject, runRuleDTO))
     }
 
     @PostMapping("/formatter/run")
@@ -63,6 +63,6 @@ class RuleController(
         jwt: Jwt,
         runRuleDTO: RunRuleDTO,
     ): ResponseEntity<FormatterOutput> {
-        return ResponseEntity.ok(formatterRuleService.runFormatterRules(jwt.subject, runRuleDTO))
+        return ResponseEntity.ok(formatterRuleService.runRules(jwt.subject, runRuleDTO))
     }
 }

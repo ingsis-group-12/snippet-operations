@@ -9,11 +9,13 @@ import ingsis.group12.snippetoperations.asset.service.SnippetService
 import ingsis.group12.snippetoperations.bucket.ObjectStoreService
 import ingsis.group12.snippetoperations.exception.SnippetCreationError
 import ingsis.group12.snippetoperations.exception.SnippetNotFoundError
+import ingsis.group12.snippetoperations.mock.MockLinterRuleService
 import ingsis.group12.snippetoperations.mock.MockObjectStoreService
 import ingsis.group12.snippetoperations.mock.MockObjectStoreServiceWithConflict
 import ingsis.group12.snippetoperations.mock.MockPermissionService
 import ingsis.group12.snippetoperations.mock.MockPermissionServiceAsNotOwner
 import ingsis.group12.snippetoperations.mock.MockPermissionServiceWithBadResponse
+import ingsis.group12.snippetoperations.mock.MockRunnerService
 import ingsis.group12.snippetoperations.permission.service.PermissionService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -43,14 +45,21 @@ class SnippetServiceTest {
 
     @BeforeEach
     fun setUp() {
-        snippetService = SnippetService(snippetRepository, objectStoreService, permissionService)
+        snippetService =
+            SnippetService(
+                snippetRepository,
+                objectStoreService,
+                permissionService,
+                MockRunnerService(),
+                MockLinterRuleService(),
+            )
     }
 
     @Test
     fun `createAsset should create a new snippet when permissions and storage are successful`() {
         val snippetInput = SnippetInput("test", "content", "java", ".java", "userName")
         val userId = "user1"
-
+        `when`(snippetRepository.save(any())).thenReturn(Snippet(UUID.randomUUID(), "test", "java", ".java"))
         val result = snippetService.createAsset(snippetInput, userId)
 
         assertNotNull(result.id)
@@ -105,7 +114,11 @@ class SnippetServiceTest {
     fun `createAsset should throw an error when permissions creation fails`() {
         val snippetInput = SnippetInput("test", "content", "java", ".java", "userName")
         val userId = "user1"
-        snippetService = SnippetService(snippetRepository, objectStoreService, MockPermissionServiceWithBadResponse())
+        snippetService =
+            SnippetService(
+                snippetRepository, objectStoreService,
+                MockPermissionServiceWithBadResponse(), MockRunnerService(), MockLinterRuleService(),
+            )
         assertThrows<SnippetCreationError> {
             snippetService.createAsset(snippetInput, userId)
         }
@@ -116,7 +129,11 @@ class SnippetServiceTest {
         val snippetInput = SnippetInput("test", "content", "java", ".java", "userName")
         val userId = "user1"
 
-        snippetService = SnippetService(snippetRepository, MockObjectStoreServiceWithConflict(), permissionService)
+        snippetService =
+            SnippetService(
+                snippetRepository, MockObjectStoreServiceWithConflict(),
+                permissionService, MockRunnerService(), MockLinterRuleService(),
+            )
         assertThrows<SnippetCreationError> {
             snippetService.createAsset(snippetInput, userId)
         }
@@ -148,7 +165,11 @@ class SnippetServiceTest {
     fun `deleteAssetById should throw an error when storage deletion fails`() {
         val snippetId = UUID.randomUUID()
         val userId = "user1"
-        snippetService = SnippetService(snippetRepository, MockObjectStoreServiceWithConflict(), permissionService)
+        snippetService =
+            SnippetService(
+                snippetRepository, MockObjectStoreServiceWithConflict(),
+                permissionService, MockRunnerService(), MockLinterRuleService(),
+            )
 
         assertThrows<SnippetNotFoundError> {
             snippetService.deleteAssetById(snippetId, userId)
@@ -157,7 +178,11 @@ class SnippetServiceTest {
 
     @Test
     fun `deleteAssetById as not owner should fail`() {
-        snippetService = SnippetService(snippetRepository, objectStoreService, MockPermissionServiceAsNotOwner())
+        snippetService =
+            SnippetService(
+                snippetRepository, objectStoreService,
+                MockPermissionServiceAsNotOwner(), MockRunnerService(), MockLinterRuleService(),
+            )
         val snippetId = UUID.randomUUID()
         val snippet = Snippet(snippetId, "test", "java", ".java")
 
@@ -193,7 +218,11 @@ class SnippetServiceTest {
 
     @Test
     fun `shareAsset should fail when user is not owner of the asset`() {
-        snippetService = SnippetService(snippetRepository, objectStoreService, MockPermissionServiceAsNotOwner())
+        snippetService =
+            SnippetService(
+                snippetRepository, objectStoreService,
+                MockPermissionServiceAsNotOwner(), MockRunnerService(), MockLinterRuleService(),
+            )
         val userId = "user2"
         val shareDTO = ShareDTO(UUID.randomUUID(), userId, "userName")
         val snippetId = UUID.randomUUID()
@@ -227,7 +256,11 @@ class SnippetServiceTest {
         val snippetId = UUID.randomUUID()
         val input = SnippetUpdateInput("test", "content 2 ")
         `when`(snippetRepository.findById(snippetId)).thenReturn(Optional.empty())
-        snippetService = SnippetService(snippetRepository, objectStoreService, MockPermissionService())
+        snippetService =
+            SnippetService(
+                snippetRepository, objectStoreService, MockPermissionService(),
+                MockRunnerService(), MockLinterRuleService(),
+            )
         assertThrows<SnippetNotFoundError> {
             snippetService.updateAsset(snippetId, input, userId)
         }

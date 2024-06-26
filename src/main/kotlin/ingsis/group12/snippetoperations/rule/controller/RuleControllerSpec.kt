@@ -50,7 +50,7 @@ interface RuleControllerSpec {
             ),
         ],
     )
-    fun updateLinterRules(
+    suspend fun updateLinterRules(
         @AuthenticationPrincipal jwt: Jwt,
         @RequestBody linterRuleInput: LinterRuleInput,
     ): ResponseEntity<LinterRuleInput>
@@ -102,7 +102,7 @@ interface RuleControllerSpec {
             ),
         ],
     )
-    fun updateFormatterRules(
+    suspend fun updateFormatterRules(
         @AuthenticationPrincipal jwt: Jwt,
         @RequestBody formatterRules: FormatterRules,
     ): ResponseEntity<FormatterRules>
