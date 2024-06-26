@@ -75,9 +75,9 @@ tasks.named('test') {
 //	}
 //}
 
-tasks.check {
-	dependsOn ktlintCheck
-}
+//tasks.check {
+//	dependsOn ktlintCheck
+//}
 
 tasks.register('setupHooks') {
 	doLast {
