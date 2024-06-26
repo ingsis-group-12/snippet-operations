@@ -1,12 +1,14 @@
 FROM gradle:latest as build
-COPY . /home/gradle/src
-WORKDIR /home/gradle/src
-RUN gradle assemble
+
 ARG USERNAME
 ENV GITHUB_ACTOR=$USERNAME
 
 ARG TOKEN
 ENV GITHUB_TOKEN=$TOKEN
+COPY . /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle assemble
+
 
 FROM openjdk:17-jdk-alpine
 EXPOSE 8081
