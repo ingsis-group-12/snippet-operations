@@ -6,7 +6,6 @@ import ingsis.group12.snippetoperations.redis.input.ProducerRequest
 import org.austral.ingsis.redis.RedisStreamConsumer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Profile
 import org.springframework.data.redis.connection.stream.ObjectRecord
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.stream.StreamReceiver
