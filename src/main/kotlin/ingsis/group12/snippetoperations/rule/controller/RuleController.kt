@@ -8,11 +8,14 @@ import ingsis.group12.snippetoperations.rule.service.LinterRuleService
 import ingsis.group12.snippetoperations.runner.output.FormatterOutput
 import ingsis.group12.snippetoperations.runner.output.LinterOutput
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -25,43 +28,47 @@ class RuleController(
     private val linterRuleService: LinterRuleService,
 ) : RuleControllerSpec {
     @PostMapping("/linter")
-    override fun createOrGetLinterRules(jwt: Jwt): ResponseEntity<LinterRuleInput> {
+    override fun createOrGetLinterRules(
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<LinterRuleInput> {
         return ResponseEntity.ok(linterRuleService.createOrGetRules(jwt.subject))
     }
 
     @PutMapping("/linter")
     override suspend fun updateLinterRules(
-        jwt: Jwt,
-        linterRuleInput: LinterRuleInput,
+        @AuthenticationPrincipal jwt: Jwt,
+        @Valid @RequestBody linterRuleInput: LinterRuleInput,
     ): ResponseEntity<LinterRuleInput> {
         return ResponseEntity.ok(linterRuleService.updateRules(jwt.subject, linterRuleInput))
     }
 
     @PostMapping("/formatter")
-    override fun createOrGetFormatterRules(jwt: Jwt): ResponseEntity<FormatterRules> {
+    override fun createOrGetFormatterRules(
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<FormatterRules> {
         return ResponseEntity.ok(formatterRuleService.createOrGetRules(jwt.subject))
     }
 
     @PutMapping("/formatter")
     override suspend fun updateFormatterRules(
-        jwt: Jwt,
-        formatterRules: FormatterRules,
+        @AuthenticationPrincipal jwt: Jwt,
+        @Valid @RequestBody formatterRules: FormatterRules,
     ): ResponseEntity<FormatterRules> {
         return ResponseEntity.ok(formatterRuleService.updateRules(jwt.subject, formatterRules))
     }
 
     @PostMapping("/linter/run")
     override fun runLinterRules(
-        jwt: Jwt,
-        runRuleDTO: RunRuleDTO,
+        @AuthenticationPrincipal jwt: Jwt,
+        @Valid @RequestBody runRuleDTO: RunRuleDTO,
     ): ResponseEntity<LinterOutput> {
         return ResponseEntity.ok(linterRuleService.runRules(jwt.subject, runRuleDTO))
     }
 
     @PostMapping("/formatter/run")
     override fun runFormatterRules(
-        jwt: Jwt,
-        runRuleDTO: RunRuleDTO,
+        @AuthenticationPrincipal jwt: Jwt,
+        @Valid @RequestBody runRuleDTO: RunRuleDTO,
     ): ResponseEntity<FormatterOutput> {
         return ResponseEntity.ok(formatterRuleService.runRules(jwt.subject, runRuleDTO))
     }

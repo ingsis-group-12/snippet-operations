@@ -5,6 +5,8 @@ import ingsis.group12.snippetoperations.asset.dto.SnippetDTO
 import ingsis.group12.snippetoperations.asset.dto.UserShareDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
 import ingsis.group12.snippetoperations.asset.input.SnippetUpdateInput
+import ingsis.group12.snippetoperations.runner.input.ExecutorInput
+import ingsis.group12.snippetoperations.runner.output.ExecutorOutput
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -196,4 +198,40 @@ interface SnippetControllerSpec {
         @PathVariable("id") snippetId: UUID,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<List<UserShareDTO>>
+
+    @PostMapping("/run/{snippetId}")
+    @Operation(
+        summary = "Run a snippet",
+        security = [SecurityRequirement(name = " Bearer Token")],
+        parameters = [
+            Parameter(
+                name = "snippetId",
+                required = true,
+                description = "Snippet id",
+                example = "123e4567-e89b-12d3-a456-426614174000",
+            ),
+        ],
+        requestBody =
+            RequestBodyDoc(content = [Content(schema = Schema(implementation = ExecutorInput::class, required = true))]),
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = [Content(schema = Schema(implementation = ExecutorOutput::class))],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Not Found when snippet not found",
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "User has not permissions to run snippet",
+            ),
+        ],
+    )
+    fun runSnippet(
+        @PathVariable("snippetId") snippetId: UUID,
+        @AuthenticationPrincipal jwt: Jwt,
+        @RequestBody executeInput: ExecutorInput,
+    ): ResponseEntity<ExecutorOutput>
 }

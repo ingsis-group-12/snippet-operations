@@ -14,12 +14,15 @@ import ingsis.group12.snippetoperations.bucket.ObjectStoreService
 import ingsis.group12.snippetoperations.exception.SnippetCreationError
 import ingsis.group12.snippetoperations.exception.SnippetDeleteError
 import ingsis.group12.snippetoperations.exception.SnippetNotFoundError
+import ingsis.group12.snippetoperations.exception.SnippetPermissionError
 import ingsis.group12.snippetoperations.exception.SnippetShareError
 import ingsis.group12.snippetoperations.permission.model.SnippetPermission
 import ingsis.group12.snippetoperations.permission.service.PermissionService
 import ingsis.group12.snippetoperations.rule.dto.LinterRuleInput
 import ingsis.group12.snippetoperations.rule.service.RuleService
+import ingsis.group12.snippetoperations.runner.input.ExecutorInput
 import ingsis.group12.snippetoperations.runner.input.LinterInput
+import ingsis.group12.snippetoperations.runner.output.ExecutorOutput
 import ingsis.group12.snippetoperations.runner.output.LinterOutput
 import ingsis.group12.snippetoperations.runner.service.RunnerService
 import ingsis.group12.snippetoperations.util.parseLintingRulesToString
@@ -95,7 +98,7 @@ class SnippetService(
     ): SnippetDTO {
         val input = assetInput as SnippetUpdateInput
         val snippetOptional = snippetRepository.findById(assetId)
-        if (snippetOptional.isPresent && canUpdate(userId, assetId)) {
+        if (snippetOptional.isPresent && hasPermissions(userId, assetId)) {
             val snippet = snippetOptional.get()
             val lintingRules = linterRuleService.createOrGetRules(userId)
             val lintingRulesToString = parseLintingRulesToString(lintingRules)
@@ -163,6 +166,22 @@ class SnippetService(
         }
     }
 
+    fun executeSnippet(
+        snippetId: UUID,
+        userId: String,
+        executeInput: ExecutorInput,
+    ): ExecutorOutput {
+        val snippet = snippetRepository.findById(snippetId)
+        if (snippet.isPresent) {
+            if (!hasPermissions(userId, snippetId)) {
+                throw SnippetPermissionError("User has not permissions to run snippet")
+            }
+            val result = runnerService.execute(executeInput)
+            return result
+        }
+        throw SnippetNotFoundError("Snippet not found")
+    }
+
     private fun applyRules(
         snippet: Snippet,
         content: String,
@@ -219,7 +238,7 @@ class SnippetService(
         userId: String,
     ) = permissionService.getUserPermissionByAssetId(assetId, userId).body!!.permission == "owner"
 
-    private fun canUpdate(
+    private fun hasPermissions(
         userId: String,
         snippetId: UUID,
     ): Boolean {

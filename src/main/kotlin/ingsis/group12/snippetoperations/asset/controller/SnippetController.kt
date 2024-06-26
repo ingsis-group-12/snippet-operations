@@ -6,6 +6,8 @@ import ingsis.group12.snippetoperations.asset.dto.UserShareDTO
 import ingsis.group12.snippetoperations.asset.input.SnippetInput
 import ingsis.group12.snippetoperations.asset.input.SnippetUpdateInput
 import ingsis.group12.snippetoperations.asset.service.SnippetService
+import ingsis.group12.snippetoperations.runner.input.ExecutorInput
+import ingsis.group12.snippetoperations.runner.output.ExecutorOutput
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -88,12 +90,23 @@ class SnippetController(
 
     @PutMapping("/{id}")
     override fun updateSnippet(
-        @PathVariable("id")snippetId: UUID,
+        @PathVariable("id") snippetId: UUID,
         @Valid @RequestBody input: SnippetUpdateInput,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<SnippetDTO> {
         val userId = jwt.subject
         val snippet = snippetService.updateAsset(snippetId, input, userId)
         return ResponseEntity.ok(snippet)
+    }
+
+    @PostMapping("/run/{snippetId}")
+    override fun runSnippet(
+        @PathVariable("snippetId") snippetId: UUID,
+        @AuthenticationPrincipal jwt: Jwt,
+        @Valid @RequestBody executeInput: ExecutorInput,
+    ): ResponseEntity<ExecutorOutput> {
+        val userId = jwt.subject
+        val result = snippetService.executeSnippet(snippetId, userId, executeInput)
+        return ResponseEntity.ok(result)
     }
 }
