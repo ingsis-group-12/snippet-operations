@@ -1,3 +1,71 @@
+services:
+  snippet-operations:
+    container_name: "snippet-operations"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_OPERATIONS_HOST: ${POSTGRES_OPERATIONS_HOST}
+      POSTGRES_OPERATIONS_PORT: ${POSTGRES_OPERATIONS_PORT}
+      BUCKET_URL: ${BUCKET_URL}
+      PERMISSIONS_URL: ${PERMISSIONS_URL}
+      RUNNER_URL: ${RUNNER_URL}
+      NEW_RELIC_AGENT_ENABLED: false
+      REDIS_HOST: ${REDIS_HOST}
+    depends_on:
+      - asset-service
+      - postgres-operations
+      - redis
+
+  postgres-operations:
+    container_name: "postgres-operations"
+    image: postgres:alpine
+    restart: always
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-operations-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  asset-service:
+    container_name: "asset-service"
+    image: ghcr.io/austral-ingsis/snippet-asset-service:latest
+    ports:
+      - "8080:8080"
+    environment:
+      AZURE_HOST: "http://azurite"
+      NEW_RELIC_AGENT_ENABLED: false
+
+  azurite:
+    container_name: "azurite"
+    image: mcr.microsoft.com/azure-storage/azurite
+    hostname: azurite
+    restart: always
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - blob:/workspace
+
+  redis:
+    container_name: "redis"
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+volumes:
+  postgres-operations-data:
+  blob:
+    external: false
+
+
 #services:
 #  snippet-operations:
 #    container_name: "snippet-operations"
@@ -16,11 +84,11 @@
 #      RUNNER_URL: ${RUNNER_URL}
 #      NEW_RELIC_AGENT_ENABLED: false
 #    depends_on:
-#      - asset-service
-#      - postgres-operations
+#      - asset_service_dev
+#      - postgres
 #
-#  postgres-operations:
-#    container_name: "postgres-operations"
+#  postgres:
+#    container_name: "postgres"
 #    image: postgres:alpine
 #    restart: always
 #    ports:
@@ -32,8 +100,8 @@
 #      POSTGRES_USER: ${POSTGRES_USER}
 #      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 #
-#  asset-service:
-#    container_name: "asset-service"
+#  asset_service_dev:
+#    container_name: "asset_service_dev"
 #    image: ghcr.io/austral-ingsis/snippet-asset-service:latest
 #    ports:
 #      - "8080:8080"
@@ -41,8 +109,8 @@
 #      AZURE_HOST: "http://azurite"
 #      NEW_RELIC_AGENT_ENABLED: false
 #
-#  azurite:
-#    container_name: "azurite"
+#  azurite_dev:
+#    container_name: "azurite_dev"
 #    image: mcr.microsoft.com/azure-storage/azurite
 #    hostname: azurite
 #    restart: always
@@ -53,74 +121,13 @@
 #    volumes:
 #      - blob:/workspace
 #
+#  redis:
+#    container_name: "redis"
+#    image: redis:6-alpine
+#    ports:
+#      - "6379:6379"
+#
 #volumes:
 #  postgres-operations-data:
 #  blob:
 #    external: false
-
-
-services:
-  snippet-operations:
-    container_name: "snippet-operations"
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8081:8081"
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_OPERATIONS_HOST: ${POSTGRES_OPERATIONS_HOST}
-      POSTGRES_OPERATIONS_PORT: ${POSTGRES_OPERATIONS_PORT}
-      BUCKET_URL: ${BUCKET_URL}
-      PERMISSIONS_URL: ${PERMISSIONS_URL}
-      RUNNER_URL: ${RUNNER_URL}
-      NEW_RELIC_AGENT_ENABLED: false
-    depends_on:
-      - asset_service_dev
-      - postgres
-
-  postgres:
-    container_name: "postgres"
-    image: postgres:latest
-    restart: always
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres-operations-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-  asset_service_dev:
-    container_name: "asset_service_dev"
-    image: ghcr.io/austral-ingsis/snippet-asset-service:latest
-    ports:
-      - "8080:8080"
-    environment:
-      AZURE_HOST: "http://azurite"
-      NEW_RELIC_AGENT_ENABLED: false
-
-  azurite_dev:
-    container_name: "azurite_dev"
-    image: mcr.microsoft.com/azure-storage/azurite
-    hostname: azurite
-    restart: always
-    ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
-    volumes:
-      - blob:/workspace
-
-  redis:
-    container_name: "redis"
-    image: redis:6-alpine
-    ports:
-      - "6379:6379"
-
-volumes:
-  postgres-operations-data:
-  blob:
-    external: false
