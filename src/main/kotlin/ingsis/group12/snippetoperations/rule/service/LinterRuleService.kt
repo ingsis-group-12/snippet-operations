@@ -15,6 +15,7 @@ import ingsis.group12.snippetoperations.runner.output.LinterOutput
 import ingsis.group12.snippetoperations.runner.service.RunnerService
 import ingsis.group12.snippetoperations.util.parseLintingRulesToString
 import ingsis.group12.snippetoperations.util.parseToLinterRules
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -30,10 +31,13 @@ class LinterRuleService(
 ) : RuleService<LinterRuleInput, LinterOutput> {
     @Autowired
     private val bucket = AzureObjectStoreService(linterBucketUrl)
+    private val logger = LoggerFactory.getLogger(LinterRuleService::class.java)
 
     override fun createOrGetRules(userId: String): LinterRuleInput {
+        logger.info("Creating or getting linting rules for user $userId")
         val linterRules = linterRuleRepository.findByUserId(userId)
         return if (linterRules.isPresent) {
+            logger.info("Rules found for user $userId")
             val linterRuleInput = getLinterRules(linterRules.get())
             return linterRuleInput
         } else {
@@ -45,10 +49,13 @@ class LinterRuleService(
         userId: String,
         rules: LinterRuleInput,
     ): LinterRuleInput {
+        logger.info("Updating rules for user $userId")
         val linterRule = linterRuleRepository.findByUserId(userId)
+        logger.info("Rules found for user $userId")
         if (linterRule.isPresent) {
             return update(rules, linterRule.get(), userId)
         } else {
+            logger.error("User has not linting rules defined")
             throw SnippetRuleError("User has not linting rules defined")
         }
     }
@@ -57,21 +64,27 @@ class LinterRuleService(
         userId: String,
         runRuleDTO: RunRuleDTO,
     ): LinterOutput {
+        logger.info("Running rules for user $userId")
         val linterRules = linterRuleRepository.findByUserId(userId)
 
         if (!canApplyRules(userId, runRuleDTO.snippetId!!)) {
+            logger.error("User does not have permission to apply rules")
             return LinterOutput("", "User does not have permission to apply rules.")
         }
 
         val linterRulesInString =
             if (linterRules.isEmpty) {
+                logger.info("Creating rules for user $userId")
                 val linterRuleInput = createLinterRules(userId)
                 parseLintingRulesToString(linterRuleInput)
             } else {
+                logger.info("Rules found for user $userId")
                 val result = getLinterRules(linterRules.get())
                 parseLintingRulesToString(result)
             }
+        logger.info("Analyzing code snippet")
         val lintResult = runnerService.analyze(LinterInput(runRuleDTO.content!!, runRuleDTO.language!!, linterRulesInString))
+        logger.info("Code snippet analyzed")
         return lintResult
     }
 
@@ -88,6 +101,7 @@ class LinterRuleService(
 
     private suspend fun executeProducer(userId: String) {
         val snippets = permissionService.getUserPermissionsByUserId(userId).body!!.filter { it.permission != "read" }
+        logger.info("Executing producer for user $userId")
         snippets.forEach {
             producer.publishEvent(ProducerRequest(snippetId = it.assetId, userId))
         }
@@ -96,6 +110,7 @@ class LinterRuleService(
     private fun createLinterRules(userId: String): LinterRuleInput {
         val defaultRules = createDefaultLinterRules()
         val linterRuleId = UUID.randomUUID()
+        logger.info("Creating rules for user $userId")
         bucket.create(parseLintingRulesToString(defaultRules), linterRuleId)
         linterRuleRepository.save(LinterRule(id = linterRuleId, userId = userId))
         return defaultRules

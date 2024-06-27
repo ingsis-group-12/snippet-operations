@@ -14,6 +14,7 @@ import ingsis.group12.snippetoperations.runner.output.FormatterOutput
 import ingsis.group12.snippetoperations.runner.service.RunnerService
 import ingsis.group12.snippetoperations.util.parseFormattingRulesToString
 import ingsis.group12.snippetoperations.util.parseToFormatterRules
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -30,9 +31,14 @@ class FormatterRuleService(
     @Autowired
     private val bucket = AzureObjectStoreService(formatterBucketUrl)
 
+    private val logger = LoggerFactory.getLogger(FormatterRuleService::class.java)
+
     override fun createOrGetRules(userId: String): FormatterRules {
+        logger.info("Creating or formatting getting rules for user $userId")
         val formatterRules = formatterRuleRepository.findByUserId(userId)
+        logger.info("Rules found for user $userId")
         return if (formatterRules.isPresent) {
+            logger.info("Rules found for user $userId")
             val formatterRulesInputList = getFormatterRules(formatterRules.get())
             return FormatterRules(formatterRulesInputList)
         } else {
@@ -44,10 +50,13 @@ class FormatterRuleService(
         userId: String,
         rules: FormatterRules,
     ): FormatterRules {
+        logger.info("Updating rules for user $userId")
         val formatterRule = formatterRuleRepository.findByUserId(userId)
+        logger.info("Rules found for user $userId")
         if (formatterRule.isPresent) {
             return update(rules, formatterRule)
         } else {
+            logger.error("User has not linting rules defined")
             throw SnippetRuleError("User has not linting rules defined")
         }
     }
@@ -65,6 +74,7 @@ class FormatterRuleService(
             val formatterRulesInputList = getFormatterRules(formatterRules.get())
             return runnerService.format(FormatterInput(runRuleDTO.content!!, runRuleDTO.language, formatterRulesInputList))
         } else {
+            logger.error("User does not have permission to apply rules")
             return FormatterOutput("", "User does not have permission to apply rules.")
         }
     }
@@ -81,7 +91,9 @@ class FormatterRuleService(
     private fun createFormatterRules(userId: String): FormatterRules {
         val defaultRules = createDefaultFormatterRules()
         val formatterRuleId = UUID.randomUUID()
+        logger.info("Saving formatting rules into bucket for user $userId")
         bucket.create(parseFormattingRulesToString(defaultRules), formatterRuleId)
+        logger.info("Saving formatting rules into database for user $userId")
         formatterRuleRepository.save(FormatterRule(id = formatterRuleId, userId = userId))
         return defaultRules
     }

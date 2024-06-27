@@ -14,6 +14,7 @@ import ingsis.group12.snippetoperations.testcase.dto.TestCaseResponseDTO
 import ingsis.group12.snippetoperations.testcase.dto.TestCaseResultDTO
 import ingsis.group12.snippetoperations.testcase.model.TestCase
 import ingsis.group12.snippetoperations.testcase.repository.TestCaseRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -25,14 +26,16 @@ class TestCaseService(
     private val runnerService: RunnerService,
     private val permissionService: PermissionService,
 ) {
-    // TODO: Add implementation on bucket with this to store inputs,
-    // outputs and environment variables of test cases
+    private val logger = LoggerFactory.getLogger(TestCaseService::class.java)
+
     fun createTestCase(
         snippetId: UUID,
         testCaseDTO: TestCaseDTO,
     ): TestCaseResponseDTO {
+        logger.info("Creating test case for snippet $snippetId")
         val snippet = snippetRepository.findById(snippetId)
         if (snippet.isPresent) {
+            logger.info("Snippet found")
             val testCase =
                 TestCase(
                     snippet = snippet.get(),
@@ -41,7 +44,9 @@ class TestCaseService(
                     outputs = testCaseDTO.outputs!!.joinToString(separator = "\n"),
                     environmentVariables = testCaseDTO.environment!!.joinToString(";") { "${it.key}=${it.value}" },
                 )
+            logger.info("Saving test case")
             val testCaseSaved = testCaseRepository.save(testCase)
+            logger.info("Test case saved")
             return convertToTestCaseResponse(testCaseSaved)
         } else {
             throw SnippetNotFoundError("Snippet not found")
@@ -49,7 +54,9 @@ class TestCaseService(
     }
 
     fun getTestCasesBySnippetId(snippetId: UUID): List<TestCaseResponseDTO> {
+        logger.info("Getting test cases for snippet $snippetId")
         val testCases = testCaseRepository.getTestCasesBySnippetId(snippetId)
+        logger.info("Test cases retrieved for snippet $snippetId")
         return testCases.map { testCase ->
             convertToTestCaseResponse(testCase)
         }
@@ -59,8 +66,10 @@ class TestCaseService(
         testCaseId: UUID,
         testCaseDTO: TestCaseDTO,
     ): TestCaseDTO {
+        logger.info("Updating test case $testCaseId")
         val optionalTestCase = testCaseRepository.findById(testCaseId)
         if (optionalTestCase.isPresent) {
+            logger.info("Test case found")
             val testCase = optionalTestCase.get()
             val updatedTestCase =
                 testCase.copy(
@@ -69,14 +78,17 @@ class TestCaseService(
                     outputs = testCaseDTO.outputs!!.joinToString(separator = "\n"),
                     environmentVariables = testCaseDTO.environment!!.joinToString(";") { "${it.key}=${it.value}" },
                 )
+            logger.info("Saving updated test case")
             testCaseRepository.save(updatedTestCase)
             return testCaseDTO
         } else {
+            logger.error("Test case not found")
             throw SnippetNotFoundError("Test case not found")
         }
     }
 
     fun deleteTestCase(testCaseId: UUID) {
+        logger.info("Deleting test case $testCaseId")
         testCaseRepository.deleteById(testCaseId)
     }
 
@@ -84,13 +96,16 @@ class TestCaseService(
         testCaseId: UUID,
         userId: String,
     ): TestCaseResultDTO {
+        logger.info("Running test case $testCaseId")
         val testCase = findTestCaseById(testCaseId)
         if (!canExecuteTestCase(testCase, userId)) {
+            logger.error("User does not have permission to run this test case")
             throw SnippetPermissionError("User does not have permission to run this test case")
         }
         val inputs = parseInputs(testCase.inputs)
         val expectedOutputs = parseOutputs(testCase.outputs)
         val environmentVariables = parseEnvironmentVariables(testCase.environmentVariables)
+        logger.info("Getting snippet content for test case $testCaseId")
         val snippetContent = getSnippetContent(testCase.snippet!!.id!!)
 
         val executorInput =
@@ -99,9 +114,9 @@ class TestCaseService(
                 inputs = inputs,
                 env = environmentVariables,
             )
-
+        logger.info("Executing test case $testCaseId")
         val executorOutput = runnerService.execute(executorInput)
-
+        logger.info("Test case executed  $testCaseId")
         return evaluateTestCaseResult(executorOutput, expectedOutputs)
     }
 
