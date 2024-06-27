@@ -85,7 +85,7 @@ class TestCaseService(
         userId: String,
     ): TestCaseResultDTO {
         val testCase = findTestCaseById(testCaseId)
-        if (canExecuteTestCase(testCase, userId)) {
+        if (!canExecuteTestCase(testCase, userId)) {
             throw SnippetPermissionError("User does not have permission to run this test case")
         }
         val inputs = parseInputs(testCase.inputs)

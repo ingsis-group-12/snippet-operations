@@ -8,13 +8,13 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 
 @Component
-class LinterProducer
+class RedisLinterProducer
     @Autowired
     constructor(
         @Value("\${stream.key}") streamKey: String,
         redis: RedisTemplate<String, String>,
-    ) : RedisStreamProducer(streamKey, redis) {
-        suspend fun publishEvent(request: ProducerRequest) {
+    ) : LinterProducer, RedisStreamProducer(streamKey, redis) {
+        override suspend fun publishEvent(request: ProducerRequest) {
             println(
                 "Publishing on stream: $streamKey " +
                     "with snippet id : ${request.snippetId}",
@@ -22,3 +22,7 @@ class LinterProducer
             emit(request)
         }
     }
+
+interface LinterProducer {
+    suspend fun publishEvent(request: ProducerRequest)
+}

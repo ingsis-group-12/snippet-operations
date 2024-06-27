@@ -62,27 +62,27 @@ tasks.withType(KotlinCompile) {
 		jvmTarget = '17'
 	}
 }
-
-ktlintCheck {
-	enabled = false
-}
-
-ktlintFormat {
-	enabled = false
-}
-
-ktlintTestSourceSetCheck {
-	enabled = false
-}
-
-ktlintTestSourceSetFormat {
-	enabled = false
-}
-
-
-//tasks.named('test') {
-//	useJUnitPlatform()
+//
+//ktlintCheck {
+//	enabled = false
 //}
+//
+//ktlintFormat {
+//	enabled = false
+//}
+//
+//ktlintTestSourceSetCheck {
+//	enabled = false
+//}
+//
+//ktlintTestSourceSetFormat {
+//	enabled = false
+//}
+
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
 
 
 
@@ -94,33 +94,33 @@ ktlintTestSourceSetFormat {
 //	}
 //}
 
-//tasks.check {
-//	dependsOn ktlintCheck
-//}
+tasks.check {
+	dependsOn ktlintCheck
+}
 
-//tasks.register('setupHooks') {
-//	doLast {
-//		def setupHooksFile = file("${rootProject.projectDir}/.githooks/setup-hooks")
-//		exec {
-//			commandLine setupHooksFile
-//		}
-//	}
-//}
-//
-//tasks.register('checkGitHooksPath') {
-//	doLast {
-//		def desiredHooksPath = '.githooks'
-//		def currentHooksPath = 'git config core.hooksPath'.execute().text.trim()
-//
-//		if (currentHooksPath != desiredHooksPath) {
-//			println "Git hooks path is not set correctly."
-//			println "Setting git hooks path to $desiredHooksPath"
-//			"git config core.hooksPath $desiredHooksPath".execute().waitFor()
-//			println "Git hooks path set to $desiredHooksPath"
-//		} else {
-//			println "Git hooks path is already set correctly."
-//		}
-//	}
-//}
+tasks.register('setupHooks') {
+	doLast {
+		def setupHooksFile = file("${rootProject.projectDir}/.githooks/setup-hooks")
+		exec {
+			commandLine setupHooksFile
+		}
+	}
+}
 
-//build.dependsOn checkGitHooksPath
+tasks.register('checkGitHooksPath') {
+	doLast {
+		def desiredHooksPath = '.githooks'
+		def currentHooksPath = 'git config core.hooksPath'.execute().text.trim()
+
+		if (currentHooksPath != desiredHooksPath) {
+			println "Git hooks path is not set correctly."
+			println "Setting git hooks path to $desiredHooksPath"
+			"git config core.hooksPath $desiredHooksPath".execute().waitFor()
+			println "Git hooks path set to $desiredHooksPath"
+		} else {
+			println "Git hooks path is already set correctly."
+		}
+	}
+}
+
+build.dependsOn checkGitHooksPath
