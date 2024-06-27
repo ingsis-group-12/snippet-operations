@@ -124,3 +124,23 @@ tasks.register('checkGitHooksPath') {
 }
 
 build.dependsOn checkGitHooksPath
+
+
+
+//koverReport {
+//	filters {
+//		excludes {
+//			classes("ingsis.group12.snippetoperations.relic.CorrelationIdFilter",
+//					"ingsis.group12.snippetoperations.relic.RequestLogFilter",
+//					"ingsis.group12.snippetoperations.redis.consumer.LinterConsumer",
+//					"ingsis.group12.snippetoperations.redis.producer.LinterProducer",
+//					"ingsis.group12.snippetoperations.exception.ExceptionControllerAdvice",
+//					"ingsis.group12.snippetoperations.bucket.AzureObjectStoreService",
+//					"ingsis.group12.snippetoperations.permission.service.SnippetPermissionService",
+//					"ingsis.group12.snippetoperations.runner.service.SnippetRunnerService",
+//					"ingsis.group12.snippetoperations.auth.AudienceValidator",
+//					"ingsis.group12.snippetoperations.auth.SecurityConfiguration",
+//			)
+//		}
+//	}
+//}
