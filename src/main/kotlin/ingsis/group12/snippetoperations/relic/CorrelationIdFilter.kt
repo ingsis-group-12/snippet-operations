@@ -15,8 +15,8 @@ import java.util.UUID
 @Order(1)
 class CorrelationIdFilter : OncePerRequestFilter() {
     companion object {
-        private const val CORRELATION_ID_KEY = "correlation-id"
-        private const val CORRELATION_ID_HEADER = "X-Correlation-Id"
+        const val CORRELATION_ID_KEY = "correlation-id"
+        const val CORRELATION_ID_HEADER = "X-Correlation-Id"
     }
 
     @Throws(ServletException::class, IOException::class)
